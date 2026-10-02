@@ -5,10 +5,13 @@ services:
     name: pizhu
     runtime: node
     plan: free
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
-    startCommand: pnpm start
+    # Render's /usr/bin is read-only, so call pnpm through corepack instead of `corepack enable`.
+    buildCommand: corepack pnpm install --frozen-lockfile && corepack pnpm build
+    startCommand: corepack pnpm start
     healthCheckPath: /api/status
     envVars:
+      - key: COREPACK_ENABLE_DOWNLOAD_PROMPT
+        value: "0"
       - key: MODEL_PROVIDER
         value: google
       - key: GOOGLE_MODEL
