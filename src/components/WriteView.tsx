@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, ArrowRight, CheckCircle, Cloud, Keyboard, Lock, PencilSimple, PlayCircle, Smiley, Sparkle, UploadSimple } from "@phosphor-icons/react";
+import { ArrowLeft, ArrowRight, CheckCircle, Cloud, FileDoc, Keyboard, Lock, PencilSimple, PlayCircle, Smiley, Sparkle, UploadSimple } from "@phosphor-icons/react";
 import { useI18n } from "@/lib/i18n/context";
 import { useMomo } from "@/lib/momo";
 import type { Annotation, EssayContext } from "@/lib/schema";
@@ -10,6 +10,7 @@ import { SAMPLE_ESSAY } from "@/lib/sample";
 import { wordCount } from "@/lib/paragraphs";
 import { CATEGORIES, type CategoryId } from "@/lib/taxonomy";
 import { recordHandled } from "@/lib/habits";
+import { buildDocx, downloadBlob } from "@/lib/exportDocx";
 import type { useAnalysis, ParaState } from "@/lib/useAnalysis";
 import { AnnotatedText } from "./AnnotatedText";
 import { NoteSheet } from "./NoteSheet";
@@ -235,7 +236,7 @@ function Results({
   onRetry: () => void;
   onLessonChange: (open: boolean) => void;
 }) {
-  const { t, locale, script } = useI18n();
+  const { t, locale, script, explain } = useI18n();
   const momo = useMomo();
   const isDesktop = useIsDesktop();
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -392,6 +393,24 @@ function Results({
             >
               <PlayCircle size={17} weight="fill" aria-hidden />
               {t.lesson.start}
+            </button>
+          )}
+
+          {run.status === "done" && all.length > 0 && (
+            <button
+              onClick={async () => {
+                const blob = await buildDocx(run.paragraphs, {
+                  explain,
+                  zh: locale === "en" ? script : locale,
+                  hidden: dismissed,
+                  labels: { title: t.extra.docxTitle, intro: t.extra.docxIntro, severity: t.card.severity, why: t.card.why, hint: t.card.hint, nudge: t.card.nudge },
+                });
+                downloadBlob(blob, "pizhu-margin-notes.docx");
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border-2 border-rule bg-card px-3.5 py-1.5 text-sm font-medium text-ink-2 transition-transform hover:border-taro-2 hover:text-taro active:scale-[0.98]"
+            >
+              <FileDoc size={16} aria-hidden />
+              {t.extra.docx}
             </button>
           )}
 

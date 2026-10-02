@@ -179,6 +179,9 @@ const en = {
     hidden: "Note hidden.",
     undo: "Undo",
     markersEye: "Marker's eye",
+    docx: "Word (.docx)",
+    docxTitle: "Pīzhù margin notes",
+    docxIntro: "Your text is unchanged. Every note is a Word comment in the margin.",
   },
   footer: {
     tagline: "Margin notes, not rewrites.",
@@ -370,6 +373,9 @@ const zhHans: Messages = {
     hidden: "已隐藏这条批注。",
     undo: "撤销",
     markersEye: "阅卷视角",
+    docx: "Word 文档",
+    docxTitle: "Pīzhù 批注",
+    docxIntro: "你的文字没有任何改动。每条批注都是页边的 Word 批注。",
   },
   footer: {
     tagline: "只批注，不改写。",
@@ -559,6 +565,9 @@ const zhHant: Messages = {
     hidden: "已隱藏這條批註。",
     undo: "復原",
     markersEye: "閱卷視角",
+    docx: "Word 文件",
+    docxTitle: "Pīzhù 批註",
+    docxIntro: "你的文字沒有任何改動。每條批註都是頁邊的 Word 註解。",
   },
   footer: {
     tagline: "只批註，不改寫。",
