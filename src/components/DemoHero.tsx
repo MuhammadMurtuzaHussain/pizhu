@@ -150,13 +150,24 @@ function Marked({ sentence, i1, i2, show1, show2, animate }: { sentence: string;
 }
 
 /** A marker-pen underline that draws itself left to right, wrapping across lines. */
-function Underline({ on, color, n, animate, children }: { on: boolean; color: string; n: number; animate: boolean; children: React.ReactNode }) {
+function Underline({ on, color, n, animate, children }: { on: boolean; color: string; n: number; animate: boolean; children: string }) {
+  // Keep the number pearl glued to the last word so it never wraps onto a line by itself.
+  const cut = children.lastIndexOf(" ");
+  const head = cut === -1 ? "" : children.slice(0, cut + 1);
+  const tail = cut === -1 ? children : children.slice(cut + 1);
   return (
     <>
-      <UnderlineSpan on={on} color={color} animate={animate}>
-        {children}
-      </UnderlineSpan>
-      {on && <Pearl n={n} on animate={animate} />}
+      {head && (
+        <UnderlineSpan on={on} color={color} animate={animate}>
+          {head}
+        </UnderlineSpan>
+      )}
+      <span className="whitespace-nowrap">
+        <UnderlineSpan on={on} color={color} animate={animate}>
+          {tail}
+        </UnderlineSpan>
+        {on && <Pearl n={n} on animate={animate} />}
+      </span>
     </>
   );
 }
