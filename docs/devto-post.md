@@ -20,7 +20,7 @@ I have seen the same thing with a lot of friends from China and Taiwan. The mark
 - **Exam-template English.** *"With the development of society…"*, *"In a word…"* were taught as good style for 高考 and IELTS. A UK marker reads them as filler.
 - **Confident claims.** *"This proves…"* and *"Everyone knows…"* (众所周知) persuade in Chinese argumentative writing. In a UK essay they are unsupported.
 
-The usual tools make this worse. Grammar checkers and chatbots **rewrite** the paragraph. It sounds fluent, it stops sounding like the student, she learns nothing, and in a UK university an AI-rewritten essay is an academic-integrity problem.
+The usual tools make this worse. Grammar checkers and chatbots **rewrite** the paragraph. It sounds fluent, it stops sounding like the student, she learns nothing, and in UK and Irish universities an AI-rewritten essay is an academic-integrity problem.
 
 So I built **Pīzhù (批注)**. The word means *margin notes*: the comments a good teacher writes beside your work. That is the whole product:
 
@@ -175,11 +175,38 @@ Joy can choose her trade-off: E4B for quick checks while drafting, 12B before sh
 
 ## Handing it to Joy
 
-[TODO: what happened when you gave it to Joy: which draft she tried (no need to share it), which notes surprised her, whether the Chinese explanations helped, what she changed herself, and one direct quote with her permission.]
+I sent Joy the link on WeChat with a slightly nervous *"i made this app for u"*. She didn't test it on my sample essay. She tested it on what she is actually writing right now, her dissertation, and later sent back a review I could not have scripted.
 
-> [TODO: Joy's quote]
+What worked for her:
 
-[TODO: anything she asked for that you would add next.]
+> The general feeling of this app: it's very useful, especially for our module assignments. The Chinese explanation is easier to understand than the criteria written in our module 😂
+
+> Another advantage of it is that it explains why I should correct my sentence. As grammarly could only give me a red label but sometimes I don't know that's the problem and how to fix it. The explanation really helps me to understand how to write properly.
+
+That second message is the reason Pīzhù exists, put better than I managed: a red underline tells you *that* something is wrong, and Joy needed to know *why*. It is the same gap as "It's just bad English".
+
+She was just as honest about what didn't work:
+
+> As my dissertation is a long paper, when I tried to ask advice from momo, I have to send my paper separately, even need to split each chapter to 2-3 parts. Thus, momo cannot get the full understanding of my argument. If the app could do longer articles, it would be great!
+
+(She calls it "momo". That made my day.)
+
+And she had two requests:
+
+> Another advice I would like to share it that, if it could help you analyse the assignment requirements or criteria, and have similarity detection like turntin, it will help students understand how to do their assignments and worry less before submitting.
+
+### What I shipped the same evening
+
+- **Longer papers.** The hosted demo now accepts 6,000 words instead of 1,500. The cap only exists because the demo runs on free tiers; running Pīzhù locally has no limit at all.
+- **A whole-paper overview.** Mòmo now reads the entire paper in one pass, alongside the line-by-line notes, and tells you what it thinks your argument is, what works, and the three most important whole-paper fixes. If Mòmo's summary of your argument isn't what you meant, that is the most useful feedback of all.
+- **Your assignment brief, explained.** Paste the task and the marking criteria, and Mòmo restates each criterion in plain English and Chinese, then marks it met, partly or missing against your paper. Joy's line about the Chinese being easier than her module criteria was the whole spec.
+- **It travels.** The overview sits at the top of the Word export, above her own unchanged text.
+
+![Whole-paper overview checked against an assignment brief](https://raw.githubusercontent.com/MuhammadMurtuzaHussain/pizhu/main/docs/screenshots/overview.png)
+
+**Turnitin-style similarity checking is the one request I'm deliberately not building.** It only works by comparing your essay against a database of other people's papers, which means uploading and keeping your writing: exactly what Pīzhù is designed never to do. It does the honest half of that job instead: it flags claims that need a citation and checks that every reference actually exists.
+
+Her last message: *"No problem, it's already a brilliant app!"* I've promised her half the prize if it wins.
 
 ## My Agent Session
 
