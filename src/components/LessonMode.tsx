@@ -295,12 +295,12 @@ function ShareButton({ handled, habits }: { handled: number; habits: CategoryId[
       {/* Off-screen card that becomes the image. Fixed colours so it looks the same in dark mode. */}
       <div aria-hidden className="pointer-events-none fixed -left-[9999px] top-0">
         <div ref={node} style={{ width: 540, height: 720, background: "#eee8ff", color: "#2a2233", fontFamily: "var(--font-ui), sans-serif" }} className="relative overflow-hidden p-10">
-          {Array.from({ length: 14 }, (_, k) => (
-            <span
-              key={k}
-              className="absolute rounded-full"
-              style={{ width: 18, height: 18, background: "#2a2233", opacity: 0.08, left: (k * 83) % 520, top: 560 + ((k * 37) % 150) }}
-            />
+          {/* A few tapioca pearls tucked into the bottom corners, behind the content. */}
+          {[
+            [18, 640, 22], [46, 668, 16], [14, 686, 12],
+            [500, 632, 20], [474, 662, 14], [506, 684, 11],
+          ].map(([left, top, size], k) => (
+            <span key={k} className="absolute rounded-full" style={{ left, top, width: size, height: size, background: "#2a2233", opacity: 0.1 }} />
           ))}
           <div className="flex items-center gap-3">
             <div className="grid h-12 w-12 place-items-center rounded-xl text-white [writing-mode:vertical-rl]" style={{ background: "#7353cf", fontFamily: "var(--font-kai)" }}>

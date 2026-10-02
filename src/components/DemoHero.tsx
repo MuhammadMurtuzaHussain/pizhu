@@ -198,7 +198,7 @@ function Pearl({ n, on, animate = true }: { n: number; on: boolean; animate?: bo
       initial={animate ? { scale: 0, opacity: 0 } : false}
       animate={{ scale: on ? 1 : 0, opacity: on ? 1 : 0 }}
       transition={{ type: "spring", stiffness: 400, damping: 18, delay: 0.5 }}
-      className="ml-1 inline-grid h-5 w-5 -translate-y-2 place-items-center rounded-full bg-ink align-middle font-sans text-[11px] font-bold text-white"
+      className="ml-1 inline-grid h-5 w-5 -translate-y-2 place-items-center rounded-full bg-ink align-middle font-sans text-[11px] font-bold text-paper"
     >
       {n}
     </motion.span>
@@ -216,7 +216,7 @@ function DemoNote({ show, n, tone, en, zh, zhFirst }: { show: boolean; n: number
       className={`sticker rounded-2xl p-3.5 text-[13px] leading-snug ${tone === "must" ? "bg-must-bg" : "bg-worth-bg"}`}
     >
       <div className="mb-1 flex items-center gap-2">
-        <span className="grid h-5 w-5 place-items-center rounded-full bg-ink text-[11px] font-bold text-white">{n}</span>
+        <span className="grid h-5 w-5 place-items-center rounded-full bg-ink text-[11px] font-bold text-paper">{n}</span>
         <span className={`text-xs font-semibold ${tone === "must" ? "text-must" : "text-worth"}`}>{tone === "must" ? "Must fix" : "Worth fixing"}</span>
       </div>
       <p className={zhFirst ? "font-kai text-[14.5px] text-ink" : "text-ink"}>{zhFirst ? zh : en}</p>
