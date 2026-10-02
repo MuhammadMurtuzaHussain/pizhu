@@ -26,6 +26,11 @@ export function ReadingPanel({ done, total }: { done: number; total: number }) {
         <p aria-live="polite" className="text-sm font-semibold text-taro">
           {t.reading.status(Math.min(done + 1, total || 1), total || 1)}
         </p>
+        {total > 20 ? (
+          <div className="h-3 min-w-40 flex-1 overflow-hidden rounded-full bg-taro-2/40" aria-hidden>
+            <motion.div className="h-full rounded-full bg-ink" animate={{ width: `${(done / total) * 100}%` }} transition={{ type: "spring", stiffness: 60, damping: 18 }} />
+          </div>
+        ) : (
         <div className="flex gap-1.5" aria-hidden>
           {Array.from({ length: total }, (_, k) => (
             <motion.span
@@ -36,6 +41,7 @@ export function ReadingPanel({ done, total }: { done: number; total: number }) {
             />
           ))}
         </div>
+        )}
       </div>
       <div className="mt-4 min-h-[4.5rem] rounded-2xl bg-card p-4">
         <p className="mb-1.5 text-xs font-medium text-ink-3">{t.reading.tipLabel}</p>

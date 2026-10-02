@@ -1,4 +1,4 @@
-import type { Annotation } from "./schema";
+import type { Annotation, Overview } from "./schema";
 import type { ParaState } from "./useAnalysis";
 import { CATEGORIES } from "./taxonomy";
 
@@ -12,14 +12,15 @@ export type DocxLabels = {
   why: string;
   hint: string;
   nudge: string;
+  overview?: { title: string; argument: string; strength: string; priorities: string; criteria: string; status: Record<"met" | "partly" | "missing", string> };
 };
 
 export async function buildDocx(
   paragraphs: ParaState[],
-  opts: { explain: "both" | "en" | "zh"; zh: "zh-Hans" | "zh-Hant"; hidden: Set<string>; labels: DocxLabels },
+  opts: { explain: "both" | "en" | "zh"; zh: "zh-Hans" | "zh-Hant"; hidden: Set<string>; labels: DocxLabels; overview?: Overview },
 ): Promise<Blob> {
   const { Document, Packer, Paragraph, TextRun, CommentRangeStart, CommentRangeEnd, CommentReference, HeadingLevel } = await import("docx");
-  const { explain, zh, hidden, labels } = opts;
+  const { explain, zh, hidden, labels, overview } = opts;
   const showEn = explain !== "zh";
   const showZh = explain !== "en";
 
@@ -56,6 +57,30 @@ export async function buildDocx(
     return new Paragraph({ children: runs, spacing: { after: 240, line: 360 } });
   });
 
+  // Mòmo's whole-paper overview goes first, clearly separated from the student's text.
+  const ov: InstanceType<typeof Paragraph>[] = [];
+  if (overview && labels.overview) {
+    const L = labels.overview;
+    const both = (en: string, zhText: string) => [
+      ...(showEn ? [new Paragraph({ children: [new TextRun(en)], spacing: { after: 60 } })] : []),
+      ...(showZh ? [new Paragraph({ children: [new TextRun({ text: zhText, color: "5A5166" })], spacing: { after: 120 } })] : []),
+    ];
+    const h = (text: string) => new Paragraph({ children: [new TextRun({ text, bold: true, color: "7353CF", font: "Arial", size: 22 })], spacing: { before: 160, after: 60 } });
+    ov.push(new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun({ text: L.title, font: "Arial" })] }));
+    ov.push(h(L.argument), ...both(overview.argument_en, overview.argument_zh));
+    ov.push(h(L.strength), ...both(overview.strength_en, overview.strength_zh));
+    ov.push(h(L.priorities));
+    overview.priorities.forEach((p, i) => ov.push(...both(`${i + 1}. ${p.en}`, `${i + 1}. ${p.zh}`)));
+    if (overview.criteria.length) {
+      ov.push(h(L.criteria));
+      for (const c of overview.criteria) {
+        ov.push(new Paragraph({ children: [new TextRun({ text: `${c.criterion} · ${L.status[c.status]}`, bold: true })], spacing: { after: 40 } }));
+        ov.push(...both(c.en, c.zh));
+      }
+    }
+    ov.push(new Paragraph({ children: [new TextRun({ text: "────────", color: "B8A4F2" })], spacing: { before: 200, after: 360 } }));
+  }
+
   const doc = new Document({
     creator: "Pīzhù 批注",
     title: labels.title,
@@ -66,6 +91,7 @@ export async function buildDocx(
         children: [
           new Paragraph({ children: [new TextRun({ text: labels.title, bold: true, size: 28, font: "Arial" })], spacing: { after: 80 } }),
           new Paragraph({ children: [new TextRun({ text: labels.intro, italics: true, color: "6F6680", size: 20, font: "Arial" })], spacing: { after: 360 } }),
+          ...ov,
           ...body,
         ],
       },

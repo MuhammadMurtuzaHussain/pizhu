@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import type { AnalyzeEvent, Annotation, EssayContext, GuardStats, ModelParagraph } from "./schema";
+import type { AnalyzeEvent, Annotation, EssayContext, GuardStats, ModelParagraph, Overview } from "./schema";
 import { addStats, emptyStats } from "./guard";
 import { recordHabits } from "./habits";
 import type { CategoryId } from "./taxonomy";
@@ -23,6 +23,8 @@ export type RunState = {
   paragraphs: ParaState[];
   stats: GuardStats;
   error?: string;
+  /** Whole-paper overview: pending while the full-paper pass runs. */
+  overview?: { status: "pending" | "done" | "error"; data?: Overview };
 };
 
 const initial: RunState = { status: "idle", paragraphs: [], stats: emptyStats() };
@@ -49,7 +51,7 @@ export function useAnalysis() {
   const [run, setRun] = useState<RunState>(initial);
   const abort = useRef<AbortController | null>(null);
 
-  const analyze = useCallback(async (text: string, context: EssayContext) => {
+  const analyze = useCallback(async (text: string, context: EssayContext, brief?: string) => {
     abort.current?.abort();
     const ac = new AbortController();
     abort.current = ac;
@@ -58,7 +60,7 @@ export function useAnalysis() {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, context }),
+        body: JSON.stringify({ text, context, brief: brief?.trim() || undefined }),
         signal: ac.signal,
       });
       if (!res.ok) throw new Error(res.status === 429 ? "rate_limited" : `HTTP ${res.status}`);
@@ -71,7 +73,12 @@ export function useAnalysis() {
             model: e.model,
             truncated: e.truncated,
             paragraphs: e.paragraphs.map((p) => ({ ...p, status: "pending", annotations: [], summary: null, stats: emptyStats() })),
+            overview: e.paragraphs.length >= 2 ? { status: "pending" } : undefined,
           }));
+        } else if (e.type === "overview") {
+          setRun((r) => ({ ...r, overview: { status: "done", data: e.overview } }));
+        } else if (e.type === "overview_error") {
+          setRun((r) => ({ ...r, overview: { status: "error" } }));
         } else if (e.type === "paragraph") {
           for (const a of e.annotations) counts[a.category] = (counts[a.category] ?? 0) + 1;
           setRun((r) => ({

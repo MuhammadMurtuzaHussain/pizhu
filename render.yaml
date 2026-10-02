@@ -21,6 +21,6 @@ services:
       - key: SERPAPI_API_KEY
         sync: false
       - key: MAX_WORDS
-        value: "1500"
+        value: "6000"
       - key: ANALYZE_CONCURRENCY
         value: "3"

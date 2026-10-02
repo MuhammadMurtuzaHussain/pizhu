@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, ArrowRight, CheckCircle, Cloud, FileDoc, Keyboard, Lock, PencilSimple, PlayCircle, Smiley, Sparkle, UploadSimple } from "@phosphor-icons/react";
+import { ArrowLeft, ArrowRight, CaretDown, CheckCircle, ClipboardText, Cloud, FileDoc, Keyboard, Lock, PencilSimple, PlayCircle, Smiley, Sparkle, UploadSimple } from "@phosphor-icons/react";
 import { useI18n } from "@/lib/i18n/context";
 import { useMomo } from "@/lib/momo";
 import type { Annotation, EssayContext } from "@/lib/schema";
@@ -23,6 +23,7 @@ import { MarginPaper } from "./MarginPaper";
 import { LessonMode } from "./LessonMode";
 import { Momo } from "./Momo";
 import { MarkersEye } from "./MarkersEye";
+import { OverviewCard } from "./OverviewCard";
 
 type Analysis = ReturnType<typeof useAnalysis>;
 type Status = { mode: "local" | "hosted"; model: string; ready: boolean; maxWords: number | null } | null;
@@ -47,6 +48,8 @@ export function WriteView({
   analysis,
   status,
   onLessonChange,
+  brief,
+  setBrief,
 }: {
   text: string;
   setText: (s: string) => void;
@@ -55,13 +58,26 @@ export function WriteView({
   analysis: Analysis;
   status: Status;
   onLessonChange: (open: boolean) => void;
+  brief: string;
+  setBrief: (s: string) => void;
 }) {
   const { script } = useI18n();
   const { run, analyze, recheck, reset } = analysis;
   const fullCtx: EssayContext = { ...context, script };
 
   if (run.status === "idle") {
-    return <Composer text={text} setText={setText} context={context} setContext={setContext} status={status} onCheck={() => analyze(text, fullCtx)} />;
+    return (
+      <Composer
+        text={text}
+        setText={setText}
+        context={context}
+        setContext={setContext}
+        status={status}
+        brief={brief}
+        setBrief={setBrief}
+        onCheck={() => analyze(text, fullCtx, brief)}
+      />
+    );
   }
   return (
     <Results
@@ -69,7 +85,7 @@ export function WriteView({
       maxWords={status?.maxWords ?? null}
       onBack={reset}
       onRecheck={(id, txt) => recheck(id, txt, fullCtx)}
-      onRetry={() => analyze(text, fullCtx)}
+      onRetry={() => analyze(text, fullCtx, brief)}
       onLessonChange={onLessonChange}
     />
   );
@@ -83,6 +99,8 @@ function Composer({
   context,
   setContext,
   status,
+  brief,
+  setBrief,
   onCheck,
 }: {
   text: string;
@@ -90,9 +108,12 @@ function Composer({
   context: Omit<EssayContext, "script">;
   setContext: (c: Omit<EssayContext, "script">) => void;
   status: Status;
+  brief: string;
+  setBrief: (s: string) => void;
   onCheck: () => void;
 }) {
   const { t } = useI18n();
+  const [briefOpen, setBriefOpen] = useState(() => brief.trim().length > 0);
   const fileRef = useRef<HTMLInputElement>(null);
   const area = useRef<HTMLTextAreaElement>(null);
   const section = useRef<HTMLElement>(null);
@@ -171,6 +192,33 @@ function Composer({
             {dragging && (
               <div className="pointer-events-none absolute inset-0 grid place-items-center rounded-2xl border-2 border-dashed border-taro bg-taro-soft/90 text-base font-semibold text-taro">
                 {t.editor.drop}
+              </div>
+            )}
+          </div>
+
+          <div className="mt-4">
+            <button
+              onClick={() => setBriefOpen((o) => !o)}
+              aria-expanded={briefOpen}
+              className="inline-flex items-center gap-1.5 rounded-full px-1 py-1 text-sm font-medium text-taro hover:underline"
+            >
+              <ClipboardText size={16} aria-hidden />
+              {t.overview.briefToggle}
+              <CaretDown size={13} aria-hidden className={`transition-transform ${briefOpen ? "rotate-180" : ""}`} />
+            </button>
+            {briefOpen && (
+              <div className="mt-2">
+                <label htmlFor="brief" className="mb-1.5 block text-xs text-ink-3">
+                  {t.overview.briefHint}
+                </label>
+                <textarea
+                  id="brief"
+                  value={brief}
+                  onChange={(e) => setBrief(e.target.value)}
+                  placeholder={t.overview.briefPlaceholder}
+                  rows={4}
+                  className="block w-full resize-y rounded-2xl border-2 border-dashed border-taro-2/60 bg-card/80 p-4 text-sm leading-relaxed text-ink placeholder:text-ink-3 focus:border-solid focus:border-taro"
+                />
               </div>
             )}
           </div>
@@ -403,7 +451,16 @@ function Results({
                   explain,
                   zh: locale === "en" ? script : locale,
                   hidden: dismissed,
-                  labels: { title: t.extra.docxTitle, intro: t.extra.docxIntro, severity: t.card.severity, why: t.card.why, hint: t.card.hint, nudge: t.card.nudge },
+                  labels: {
+                    title: t.extra.docxTitle,
+                    intro: t.extra.docxIntro,
+                    severity: t.card.severity,
+                    why: t.card.why,
+                    hint: t.card.hint,
+                    nudge: t.card.nudge,
+                    overview: { title: t.overview.title, argument: t.overview.argument, strength: t.overview.strength, priorities: t.overview.priorities, criteria: t.overview.criteria, status: t.overview.status },
+                  },
+                  overview: run.overview?.data,
                 });
                 downloadBlob(blob, "pizhu-margin-notes.docx");
               }}
@@ -472,6 +529,8 @@ function Results({
           </div>
         </div>
       )}
+
+      {run.overview && <OverviewCard overview={run.overview} />}
 
       {isDesktop ? (
         <MarginPaper

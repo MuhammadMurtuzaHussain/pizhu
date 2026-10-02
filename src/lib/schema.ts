@@ -26,6 +26,29 @@ export const modelParagraphSchema = z.object({
   }),
 });
 
+// One pass over the whole paper: what Mòmo thinks the argument is, whole-paper
+// priorities, and (if the student pasted one) how the paper meets the brief.
+export const overviewSchema = z.object({
+  argument_en: z.string().describe("1-2 sentences: the paper's central argument as you understand it, so the student can check it comes across."),
+  argument_zh: z.string(),
+  strength_en: z.string().describe("The one thing the paper does best overall."),
+  strength_zh: z.string(),
+  priorities: z
+    .array(z.object({ dimension: z.enum(DIMENSIONS), en: z.string(), zh: z.string() }))
+    .describe("Up to 3 whole-paper priorities (argument flow, structure, signposting, consistency, referencing). Not sentence-level grammar."),
+  criteria: z
+    .array(
+      z.object({
+        criterion: z.string().describe("The criterion, restated in plain English (max 12 words)."),
+        status: z.enum(["met", "partly", "missing"]),
+        en: z.string().describe("What it asks for and how the paper does, in plain English."),
+        zh: z.string().describe("The same in natural Chinese, easier to understand than the original criteria."),
+      }),
+    )
+    .describe("Only when an assignment brief was provided: up to 6 criteria. Empty array otherwise."),
+});
+export type Overview = z.infer<typeof overviewSchema>;
+
 export type ModelAnnotation = z.infer<typeof modelAnnotationSchema>;
 export type ModelParagraph = z.infer<typeof modelParagraphSchema>;
 
@@ -59,5 +82,7 @@ export type EssayContext = z.infer<typeof contextSchema>;
 export type AnalyzeEvent =
   | { type: "meta"; mode: "local" | "hosted"; model: string; paragraphs: { id: string; text: string }[]; truncated: boolean }
   | { type: "paragraph"; id: string; annotations: Annotation[]; summary: ModelParagraph["summary"] | null; stats: GuardStats; ms: number }
+  | { type: "overview"; overview: Overview; ms: number }
+  | { type: "overview_error"; message: string }
   | { type: "error"; id?: string; message: string }
   | { type: "done"; stats: GuardStats; ms: number };

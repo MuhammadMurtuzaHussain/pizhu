@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { analyzeParagraph } from "@/mastra/analyze";
+import { analyzeOverview, analyzeParagraph } from "@/mastra/analyze";
 import { getModelConfig } from "@/mastra/model";
 import { contextSchema, type AnalyzeEvent } from "@/lib/schema";
 import { splitEssay, isHeading, wordCount } from "@/lib/paragraphs";
@@ -14,13 +14,15 @@ const bodySchema = z.object({
   context: contextSchema,
   // Re-check a single paragraph: the client sends its id so cards can be replaced in place.
   paragraphId: z.string().optional(),
+  // Optional assignment brief / marking criteria, used by the whole-paper overview.
+  brief: z.string().max(12_000).optional(),
 });
 
 export async function POST(req: Request) {
   if (rateLimited(clientIp(req))) return Response.json({ error: "rate_limited" }, { status: 429 });
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return Response.json({ error: "bad_request" }, { status: 400 });
-  const { text, context, paragraphId } = parsed.data;
+  const { text, context, paragraphId, brief } = parsed.data;
 
   const { mode, modelId } = getModelConfig();
   const split = paragraphId ? { paragraphs: [text.trim()] } : splitEssay(text);
@@ -66,7 +68,21 @@ export async function POST(req: Request) {
           }
         }
       };
-      await Promise.all(Array.from({ length: concurrency }, worker));
+      // The whole-paper overview runs alongside the paragraph notes (full checks only).
+      const overview =
+        !paragraphId && paragraphs.length >= 2
+          ? (async () => {
+              const started = Date.now();
+              try {
+                const o = await analyzeOverview(context, paragraphs.map((p) => p.text), brief);
+                send({ type: "overview", overview: o, ms: Date.now() - started });
+              } catch (err) {
+                console.error("[overview]", err);
+                send({ type: "overview_error", message: err instanceof Error ? err.message : "Overview failed" });
+              }
+            })()
+          : Promise.resolve();
+      await Promise.all([...Array.from({ length: concurrency }, worker), overview]);
       send({ type: "done", stats: total, ms: Date.now() - t0 });
       controller.close();
     },

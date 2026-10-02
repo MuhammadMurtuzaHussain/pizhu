@@ -21,6 +21,7 @@ type Tab = "write" | "references" | "habits" | "glossary";
 type Status = { mode: "local" | "hosted"; model: string; ready: boolean; scholar: boolean; maxWords: number | null };
 
 const DRAFT_KEY = "pizhu.draft.v1";
+const BRIEF_KEY = "pizhu.brief.v1";
 
 const TAB_ICONS = { write: PencilSimpleLine, references: BookOpenText, habits: Notebook, glossary: BookBookmark } as const;
 
@@ -42,6 +43,7 @@ function App() {
   const { t, locale, setLocale, explain, setExplain } = useI18n();
   const [tab, setTab] = useState<Tab>("write");
   const [text, setText] = useState("");
+  const [brief, setBrief] = useState("");
   const [context, setContext] = useState<Omit<EssayContext, "script">>({
     discipline: "Global Mass Communication",
     task: "essay",
@@ -57,6 +59,8 @@ function App() {
     try {
       const d = localStorage.getItem(DRAFT_KEY);
       if (d) setText(d); // eslint-disable-line react-hooks/set-state-in-effect
+      const b = localStorage.getItem(BRIEF_KEY);
+      if (b) setBrief(b);
     } catch {}
   }, []);
   useEffect(() => {
@@ -64,10 +68,12 @@ function App() {
       try {
         if (text) localStorage.setItem(DRAFT_KEY, text);
         else localStorage.removeItem(DRAFT_KEY);
+        if (brief) localStorage.setItem(BRIEF_KEY, brief);
+        else localStorage.removeItem(BRIEF_KEY);
       } catch {}
     }, 400);
     return () => clearTimeout(id);
-  }, [text]);
+  }, [text, brief]);
 
   useEffect(() => {
     fetch("/api/status")
@@ -147,7 +153,7 @@ function App() {
       </nav>
 
       <main className="flex-1 pb-20">
-        {tab === "write" && <WriteView text={text} setText={setText} context={context} setContext={setContext} analysis={analysis} status={status} onLessonChange={setLessonOpen} />}
+        {tab === "write" && <WriteView text={text} setText={setText} context={context} setContext={setContext} analysis={analysis} status={status} onLessonChange={setLessonOpen} brief={brief} setBrief={setBrief} />}
         {tab === "references" && <ReferencesView text={text} />}
         {tab === "habits" && <HabitsView />}
         {tab === "glossary" && <GlossaryView />}

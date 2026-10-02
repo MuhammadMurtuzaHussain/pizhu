@@ -39,3 +39,20 @@ describe("buildDocx", () => {
     expect(comments).not.toContain("空泛的开头。");
   });
 });
+
+describe("buildDocx overview", () => {
+  it("puts Mòmo's whole-paper overview above the student's text", async () => {
+    const overview = {
+      argument_en: "Short video changes how young people read news.",
+      argument_zh: "短视频改变了年轻人读新闻的方式。",
+      strength_en: "Balanced.", strength_zh: "观点平衡。",
+      priorities: [{ dimension: "argument" as const, en: "State the thesis earlier.", zh: "更早提出论点。" }],
+      criteria: [{ criterion: "Clear thesis", status: "partly" as const, en: "Thesis is vague.", zh: "论点不够清晰。" }],
+    };
+    const ovLabels = { title: "Overview", argument: "Argument", strength: "Strength", priorities: "Priorities", criteria: "Brief", status: { met: "Met", partly: "Partly", missing: "Missing" } };
+    const { doc } = await unzip(await buildDocx([para], { explain: "both", zh: "zh-Hans", hidden: new Set(), labels: { ...labels, overview: ovLabels }, overview }));
+    expect(doc).toContain("Short video changes how young people read news.");
+    expect(doc).toContain("Clear thesis · Partly");
+    expect(doc.indexOf("State the thesis earlier.")).toBeLessThan(doc.indexOf("more and more"));
+  });
+});
