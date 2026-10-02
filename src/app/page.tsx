@@ -1,69 +1,136 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useI18n, type ExplainLang } from "@/lib/i18n/context";
+import type { Locale } from "@/lib/i18n/messages";
+import type { EssayContext } from "@/lib/schema";
+import { useAnalysis } from "@/lib/useAnalysis";
+import { WriteView } from "@/components/WriteView";
+import { ReferencesView } from "@/components/ReferencesView";
+import { HabitsView } from "@/components/HabitsView";
+import { GlossaryView } from "@/components/GlossaryView";
+
+type Tab = "write" | "references" | "habits" | "glossary";
+type Status = { mode: "local" | "hosted"; model: string; ready: boolean; scholar: boolean; maxWords: number | null };
+
+const LOCALE_LABELS: [Locale, string][] = [
+  ["en", "EN"],
+  ["zh-Hans", "简"],
+  ["zh-Hant", "繁"],
+];
 
 export default function Home() {
+  const { t, locale, setLocale, explain, setExplain } = useI18n();
+  const [tab, setTab] = useState<Tab>("write");
+  const [text, setText] = useState("");
+  const [context, setContext] = useState<Omit<EssayContext, "script">>({
+    discipline: "Global Mass Communication",
+    task: "essay",
+    level: "postgraduate",
+    variety: "uk",
+  });
+  const [status, setStatus] = useState<Status | null>(null);
+  const analysis = useAnalysis();
+
+  useEffect(() => {
+    fetch("/api/status")
+      .then((r) => r.json())
+      .then(setStatus)
+      .catch(() => setStatus(null));
+  }, []);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-4 sm:px-6">
+      <header className="flex flex-wrap items-center gap-x-4 gap-y-3 py-5">
+        <div className="flex items-center gap-3">
+          {/* A seal (印章) in vermilion: the colour of traditional 批注 margin notes. */}
+          <div aria-hidden className="grid h-11 w-11 place-items-center rounded-md bg-vermilion text-[15px] font-semibold leading-none tracking-widest text-white shadow-sm [writing-mode:vertical-rl]">
+            批注
+          </div>
+          <div>
+            <h1 className="font-serif text-2xl leading-none text-ink">Pīzhù</h1>
+            <p className="mt-1 text-xs text-ink-3">{t.brandTag}</p>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        {status && (
+          <span
+            className={`rounded-full px-3 py-1 text-xs ${
+              !status.ready ? "bg-must-bg text-must" : status.mode === "local" ? "bg-ok-bg text-ok" : "bg-style-bg text-style"
+            }`}
+            title={status.model}
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            {!status.ready ? `${t.mode.notReady} · ${status.model}` : status.mode === "local" ? `🔒 ${t.mode.local}` : `☁︎ ${t.mode.hosted}`}
+          </span>
+        )}
+
+        <div className="ml-auto flex items-center gap-3 text-xs">
+          <Segmented
+            label={t.explainIn}
+            value={explain}
+            onChange={(v) => setExplain(v as ExplainLang)}
+            options={Object.entries(t.explainOptions) as [string, string][]}
+          />
+          <Segmented label="Language / 语言" value={locale} onChange={(v) => setLocale(v as Locale)} options={LOCALE_LABELS} />
         </div>
+      </header>
+
+      <nav className="mb-8 flex gap-1 overflow-x-auto border-b border-rule [scrollbar-width:none]" aria-label="Sections">
+        {(Object.keys(t.tabs) as Tab[]).map((k) => (
+          <button
+            key={k}
+            onClick={() => setTab(k)}
+            aria-current={tab === k ? "page" : undefined}
+            className={`-mb-px whitespace-nowrap border-b-2 px-3 py-2.5 text-sm ${
+              tab === k ? "border-vermilion text-ink" : "border-transparent text-ink-3 hover:text-ink-2"
+            }`}
+          >
+            {t.tabs[k]}
+          </button>
+        ))}
+      </nav>
+
+      <main className="flex-1 pb-16">
+        {tab === "write" && <WriteView text={text} setText={setText} context={context} setContext={setContext} analysis={analysis} status={status} />}
+        {tab === "references" && <ReferencesView text={text} />}
+        {tab === "habits" && <HabitsView />}
+        {tab === "glossary" && <GlossaryView />}
       </main>
+
+      <footer className="border-t border-rule py-5 text-xs text-ink-3">
+        {t.footer}{" "}
+        <a href="https://github.com/MuhammadMurtuzaHussain/pizhu" className="underline underline-offset-2" target="_blank" rel="noreferrer">
+          GitHub
+        </a>
+      </footer>
+    </div>
+  );
+}
+
+function Segmented({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: [string, string][];
+}) {
+  return (
+    <div role="radiogroup" aria-label={label} className="flex rounded-lg border border-rule bg-card p-0.5">
+      {options.map(([k, v]) => (
+        <button
+          key={k}
+          role="radio"
+          aria-checked={value === k}
+          onClick={() => onChange(k)}
+          className={`rounded-md px-2.5 py-1 ${value === k ? "bg-ink text-paper" : "text-ink-2 hover:bg-paper-2"}`}
+        >
+          {v}
+        </button>
+      ))}
     </div>
   );
 }

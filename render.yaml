@@ -1,0 +1,23 @@
+# Hosted demo on Render. Uses Gemma via Google AI Studio (Render has no GPUs);
+# for private use, run Pīzhù locally with Ollama instead.
+services:
+  - type: web
+    name: pizhu
+    runtime: node
+    plan: free
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
+    startCommand: pnpm start
+    healthCheckPath: /api/status
+    envVars:
+      - key: MODEL_PROVIDER
+        value: google
+      - key: GOOGLE_MODEL
+        value: gemma-4-31b-it
+      - key: GOOGLE_GENERATIVE_AI_API_KEY
+        sync: false
+      - key: SERPAPI_API_KEY
+        sync: false
+      - key: MAX_WORDS
+        value: "1500"
+      - key: ANALYZE_CONCURRENCY
+        value: "3"

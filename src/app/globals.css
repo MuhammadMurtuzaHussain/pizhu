@@ -1,26 +1,114 @@
 @import "tailwindcss";
 
+/* Pīzhù palette: rice paper, ink, and 朱 vermilion — the red ink of traditional
+   批注 margin notes. Severity colours stay soft so a page of feedback never
+   looks like a wall of red pen. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --paper: #faf7f2;
+  --paper-2: #f3eee6;
+  --card: #ffffff;
+  --ink: #1f1d1a;
+  --ink-2: #57524a;
+  --ink-3: #8a847a;
+  --rule: #e4ddd2;
+  --vermilion: #c2410c;
+  --vermilion-soft: #fbe7dc;
+  --must: #c2410c;
+  --must-bg: #fde8de;
+  --worth: #a16207;
+  --worth-bg: #fbf0d0;
+  --style: #4b6584;
+  --style-bg: #e3ebf3;
+  --ok: #3f7d58;
+  --ok-bg: #e2f1e7;
+  --focus: #1d4ed8;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --paper: #171614;
+    --paper-2: #201e1b;
+    --card: #23211e;
+    --ink: #f1ece4;
+    --ink-2: #c5beb2;
+    --ink-3: #8f887d;
+    --rule: #36322d;
+    --vermilion: #f0855a;
+    --vermilion-soft: #3a2419;
+    --must: #f0855a;
+    --must-bg: #3d2318;
+    --worth: #e3b341;
+    --worth-bg: #352c14;
+    --style: #93b0d1;
+    --style-bg: #1f2a36;
+    --ok: #7cc49a;
+    --ok-bg: #1b2e22;
+    --focus: #93b4ff;
   }
 }
 
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-rule: var(--rule);
+  --color-vermilion: var(--vermilion);
+  --color-vermilion-soft: var(--vermilion-soft);
+  --color-must: var(--must);
+  --color-must-bg: var(--must-bg);
+  --color-worth: var(--worth);
+  --color-worth-bg: var(--worth-bg);
+  --color-style: var(--style);
+  --color-style-bg: var(--style-bg);
+  --color-ok: var(--ok);
+  --color-ok-bg: var(--ok-bg);
+  --font-sans: var(--font-ui), "PingFang SC", "PingFang TC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+  --font-serif: var(--font-essay), "Songti SC", "Songti TC", "Noto Serif CJK SC", Georgia, serif;
+}
+
+html {
+  background: var(--paper);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Annotated spans: a soft underline, stronger when its card is active. */
+.mark {
+  border-radius: 2px;
+  cursor: pointer;
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  transition: background-color 120ms ease;
+}
+.mark[data-sev="must_fix"] { text-decoration-color: var(--must); }
+.mark[data-sev="worth_fixing"] { text-decoration-color: var(--worth); text-decoration-style: dashed; }
+.mark[data-sev="style"] { text-decoration-color: var(--style); text-decoration-style: dotted; }
+.mark[data-active="true"][data-sev="must_fix"] { background: var(--must-bg); }
+.mark[data-active="true"][data-sev="worth_fixing"] { background: var(--worth-bg); }
+.mark[data-active="true"][data-sev="style"] { background: var(--style-bg); }
+.mark[data-resolved="true"] { text-decoration-color: var(--rule); }
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+.reading {
+  animation: pulse-soft 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reading { animation: none; }
+  .mark { transition: none; }
 }
