@@ -168,7 +168,7 @@ Joy can choose her trade-off: E4B for quick checks while drafting, 12B before sh
 
 I built Pīzhù with Claude Code over the weekend, from reading the challenge rules, to the PRD, to debugging the reference matcher and the margin-note layout:
 
-[TODO: {% agent_session <id> %}]
+{% agent_session 375 %}
 
 ## Prize Categories
 
