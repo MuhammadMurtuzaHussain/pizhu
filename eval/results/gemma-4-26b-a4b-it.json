@@ -1,0 +1,185 @@
+{
+  "summary": {
+    "model": "gemma-4-26b-a4b-it",
+    "mode": "hosted",
+    "recall": 0.895,
+    "cleanParagraphMustFix": 0,
+    "avgSecondsPerParagraph": 25.4,
+    "guard": {
+      "proposed": 48,
+      "kept": 44,
+      "droppedUnlocated": 0,
+      "droppedOverlap": 4,
+      "nudgesProposed": 34,
+      "nudgesStripped": 1
+    }
+  },
+  "rows": [
+    {
+      "id": "articles-1",
+      "caught": [
+        "articles"
+      ],
+      "missed": [],
+      "extra": [],
+      "must": 3,
+      "ms": 23434
+    },
+    {
+      "id": "countability-1",
+      "caught": [
+        "countability"
+      ],
+      "missed": [],
+      "extra": [],
+      "must": 2,
+      "ms": 13022
+    },
+    {
+      "id": "splice-1",
+      "caught": [
+        "sentence_boundary"
+      ],
+      "missed": [],
+      "extra": [
+        "register"
+      ],
+      "must": 2,
+      "ms": 14279
+    },
+    {
+      "id": "topic-1",
+      "caught": [
+        "topic_comment"
+      ],
+      "missed": [],
+      "extra": [
+        "register",
+        "articles"
+      ],
+      "must": 1,
+      "ms": 17994
+    },
+    {
+      "id": "connectors-1",
+      "caught": [
+        "connectors"
+      ],
+      "missed": [],
+      "extra": [
+        "referencing",
+        "register"
+      ],
+      "must": 1,
+      "ms": 15024
+    },
+    {
+      "id": "register-1",
+      "caught": [
+        "register"
+      ],
+      "missed": [],
+      "extra": [],
+      "must": 1,
+      "ms": 15660
+    },
+    {
+      "id": "hedging-1",
+      "caught": [
+        "hedging"
+      ],
+      "missed": [],
+      "extra": [
+        "referencing"
+      ],
+      "must": 3,
+      "ms": 14741
+    },
+    {
+      "id": "setphrase-1",
+      "caught": [
+        "set_phrases"
+      ],
+      "missed": [],
+      "extra": [],
+      "must": 0,
+      "ms": 17293
+    },
+    {
+      "id": "collocation-1",
+      "caught": [
+        "collocation"
+      ],
+      "missed": [],
+      "extra": [],
+      "must": 1,
+      "ms": 12485
+    },
+    {
+      "id": "uk-1",
+      "caught": [
+        "uk_conventions"
+      ],
+      "missed": [],
+      "extra": [],
+      "must": 0,
+      "ms": 40035
+    },
+    {
+      "id": "verb-1",
+      "caught": [
+        "verb_form"
+      ],
+      "missed": [],
+      "extra": [],
+      "must": 2,
+      "ms": 12140
+    },
+    {
+      "id": "referencing-1",
+      "caught": [
+        "referencing"
+      ],
+      "missed": [
+        "hedging"
+      ],
+      "extra": [],
+      "must": 2,
+      "ms": 20169
+    },
+    {
+      "id": "mixed-1",
+      "caught": [
+        "set_phrases",
+        "articles",
+        "sentence_boundary",
+        "countability",
+        "hedging"
+      ],
+      "missed": [
+        "verb_form"
+      ],
+      "extra": [
+        "register"
+      ],
+      "must": 2,
+      "ms": 60841
+    },
+    {
+      "id": "clean-1",
+      "caught": [],
+      "missed": [],
+      "extra": [],
+      "must": 0,
+      "ms": 68482
+    },
+    {
+      "id": "clean-2",
+      "caught": [],
+      "missed": [],
+      "extra": [],
+      "must": 0,
+      "ms": 35532
+    }
+  ]
+}
