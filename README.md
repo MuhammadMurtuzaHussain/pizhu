@@ -19,9 +19,9 @@
 
 ## Why
 
-My friend Joy is doing an MA in Global Mass Communication in the UK. Her ideas are sharp; her marks lose points to a small set of habits that make perfect sense in Chinese and read badly to a British marker: no articles (中文没有冠词), comma splices (一逗到底), exam-template phrases ("With the development of society…"), and confident claims (众所周知).
+My friend Joy is doing an MA in Global Mass Communication in an Irish University. Her ideas are sharp; her marks lose points to a small set of habits that make perfect sense in Chinese and read badly to a British marker: no articles (中文没有冠词), comma splices (一逗到底), exam-template phrases ("With the development of society…"), and confident claims (众所周知).
 
-Grammar tools and chatbots **rewrite** the paragraph. It sounds fluent, it stops sounding like her, she learns nothing, and in a UK university it is an academic-integrity risk.
+Grammar tools and chatbots **rewrite** the paragraph. It sounds fluent, it stops sounding like her, she learns nothing, and in an Irish university it is an academic-integrity risk.
 
 Pīzhù does what a good tutor does in the margin: it points at the exact words, explains *why* in English and Chinese (简体 or 繁體), including **why a Mandarin speaker tends to write it that way**, and leaves the fixing to the student.
 
