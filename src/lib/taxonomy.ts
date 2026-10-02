@@ -26,7 +26,7 @@ export type Category = {
   label: Tri;
   /** One-line rule of thumb, shown on cards and in the glossary. */
   rule: Tri;
-  /** Why a Mandarin speaker's instinct leads here — framed kindly, not as a deficit. */
+  /** Why a Mandarin speaker's instinct leads here, framed kindly, not as a deficit. */
   why: Tri;
   example: { wrong: string; better: string };
 };
@@ -41,9 +41,9 @@ export const CATEGORIES: Record<CategoryId, Category> = {
       "zh-Hant": "單數可數名詞前需要限定詞；特指或前文提過的用 the，泛指複數或不可數概念時不加冠詞。",
     },
     why: {
-      en: "Mandarin has no articles at all — specificity comes from context or words like 这/那. So English articles feel optional, but markers read them as grammar errors.",
-      "zh-Hans": "中文没有冠词，特指靠语境或“这/那”表达，所以英语冠词感觉可有可无——但阅卷老师会把漏用或误用当作语法错误。",
-      "zh-Hant": "中文沒有冠詞，特指靠語境或「這/那」表達，所以英文冠詞感覺可有可無——但閱卷老師會把漏用或誤用當作文法錯誤。",
+      en: "Mandarin has no articles at all: specificity comes from context or words like 这/那. So English articles feel optional, but markers read them as grammar errors.",
+      "zh-Hans": "中文没有冠词，特指靠语境或“这/那”表达，所以英语冠词感觉可有可无。但阅卷老师会把漏用或误用当作语法错误。",
+      "zh-Hant": "中文沒有冠詞，特指靠語境或「這/那」表達，所以英文冠詞感覺可有可無。但閱卷老師會把漏用或誤用當作文法錯誤。",
     },
     example: { wrong: "The society is changing rapidly.", better: "Society is changing rapidly." },
   },
@@ -66,9 +66,9 @@ export const CATEGORIES: Record<CategoryId, Category> = {
     id: "verb_form",
     label: { en: "Tense & agreement", "zh-Hans": "时态与主谓一致", "zh-Hant": "時態與主謂一致" },
     rule: {
-      en: "Keep tense consistent and make verbs agree with their subject — especially reporting verbs: 'Smith (2020) argues'.",
-      "zh-Hans": "保持时态一致，动词要与主语一致——尤其是转述动词：Smith (2020) argues。",
-      "zh-Hant": "保持時態一致，動詞要與主語一致——尤其是轉述動詞：Smith (2020) argues。",
+      en: "Keep tense consistent and make verbs agree with their subject, especially reporting verbs: 'Smith (2020) argues'.",
+      "zh-Hans": "保持时态一致，动词要与主语一致，尤其是转述动词：Smith (2020) argues。",
+      "zh-Hant": "保持時態一致，動詞要與主語一致，尤其是轉述動詞：Smith (2020) argues。",
     },
     why: {
       en: "Mandarin verbs don't conjugate; time is shown with words like 了/过/将. English packs that information into the verb itself.",
@@ -161,9 +161,9 @@ export const CATEGORIES: Record<CategoryId, Category> = {
       "zh-Hant": "With the development of society、Nowadays、more and more、plays an important role 等開頭很空泛。請具體說明變化是什麼、何時發生。",
     },
     why: {
-      en: "These are direct translations of 随着社会的发展 / 如今 / 越来越多 / 起着重要作用 — good style in Chinese essays, but filler to a UK marker.",
-      "zh-Hans": "这些是“随着社会的发展 / 如今 / 越来越多 / 起着重要作用”的直译——在中文作文里是好文笔，但在英国阅卷老师眼中是空话。",
-      "zh-Hant": "這些是「隨著社會的發展 / 如今 / 越來越多 / 起著重要作用」的直譯——在中文作文裡是好文筆，但在英國閱卷老師眼中是空話。",
+      en: "These are direct translations of 随着社会的发展 / 如今 / 越来越多 / 起着重要作用. Good style in Chinese essays, but filler to a UK marker.",
+      "zh-Hans": "这些是“随着社会的发展 / 如今 / 越来越多 / 起着重要作用”的直译。在中文作文里是好文笔，但在英国阅卷老师眼中是空话。",
+      "zh-Hant": "這些是「隨著社會的發展 / 如今 / 越來越多 / 起著重要作用」的直譯。在中文作文裡是好文筆，但在英國閱卷老師眼中是空話。",
     },
     example: { wrong: "With the development of society, more and more people use smartphones.", better: "Smartphone ownership among UK adults has risen sharply over the past decade (Source, Year)." },
   },
@@ -206,9 +206,9 @@ export const CATEGORIES: Record<CategoryId, Category> = {
       "zh-Hant": "非原創觀點都要標註：(Surname, Year) 或 Surname (Year)；直接引用要加頁碼；正文引用必須都出現在參考文獻列表中。",
     },
     why: {
-      en: "Citation norms in many Chinese school contexts are looser, and UK universities treat missing citations as academic misconduct — even when unintentional.",
-      "zh-Hans": "许多中文教育环境对引用的要求较宽松，而英国大学会把漏标引用视为学术不端——即使是无心之失。",
-      "zh-Hant": "許多中文教育環境對引用的要求較寬鬆，而英國大學會把漏標引用視為學術不端——即使是無心之失。",
+      en: "Citation norms in many Chinese school contexts are looser, and UK universities treat missing citations as academic misconduct, even when unintentional.",
+      "zh-Hans": "许多中文教育环境对引用的要求较宽松，而英国大学会把漏标引用视为学术不端，即使是无心之失。",
+      "zh-Hant": "許多中文教育環境對引用的要求較寬鬆，而英國大學會把漏標引用視為學術不端，即使是無心之失。",
     },
     example: { wrong: "According to research, TikTok reduces attention span.", better: "Some studies associate short-form video with reduced sustained attention (Author, Year)." },
   },

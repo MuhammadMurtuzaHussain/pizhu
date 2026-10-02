@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useI18n } from "@/lib/i18n/context";
 import { clearHabits, loadHabits, totals, type HabitSession } from "@/lib/habits";
 import { CATEGORIES } from "@/lib/taxonomy";
+import { Momo } from "./Momo";
+import { CategoryIcon } from "./CategoryIcon";
 
 export function HabitsView() {
   const { t, locale, script } = useI18n();
@@ -28,13 +30,13 @@ export function HabitsView() {
     <section className="mx-auto max-w-3xl">
       <div className="mb-6 flex flex-wrap items-end gap-3">
         <div>
-          <h2 className="font-serif text-2xl text-ink">{t.habits.title}</h2>
+          <h2 className="text-2xl font-semibold tracking-tight text-ink">{t.habits.title}</h2>
           <p className="text-sm text-ink-3">{t.habits.intro}</p>
         </div>
         {sessions.length > 0 && (
           <div className="ml-auto flex gap-2 text-xs">
             <span className="self-center text-ink-3">{t.habits.sessions(sessions.length)}</span>
-            <button onClick={exportJson} className="rounded-lg border border-rule bg-card px-3 py-1.5 text-ink-2 hover:bg-paper-2">
+            <button onClick={exportJson} className="rounded-full border border-rule bg-card px-3 py-1.5 text-ink-2 hover:bg-paper-2">
               {t.habits.export}
             </button>
             <button
@@ -44,7 +46,7 @@ export function HabitsView() {
                   setSessions([]);
                 }
               }}
-              className="rounded-lg border border-rule bg-card px-3 py-1.5 text-ink-2 hover:bg-paper-2"
+              className="rounded-full border border-rule bg-card px-3 py-1.5 text-ink-2 hover:bg-paper-2"
             >
               {t.habits.clear}
             </button>
@@ -53,13 +55,19 @@ export function HabitsView() {
       </div>
 
       {top.length === 0 ? (
-        <p className="text-sm text-ink-3">{t.habits.empty}</p>
+        <div className="flex flex-col items-center gap-3 py-12 text-center">
+          <Momo state="sleepy" size={120} />
+          <p className="text-sm text-ink-3">{t.habits.empty}</p>
+        </div>
       ) : (
         <>
           <ul className="mb-10 space-y-2">
             {top.map(([id, n]) => (
               <li key={id} className="grid grid-cols-[minmax(0,180px)_1fr_auto] items-center gap-3 text-sm">
-                <span className="truncate text-ink-2">{CATEGORIES[id].label[L]}</span>
+                <span className="inline-flex min-w-0 items-center gap-2 text-ink-2">
+                  <CategoryIcon id={id} size={15} className="shrink-0" />
+                  <span className="truncate">{CATEGORIES[id].label[L]}</span>
+                </span>
                 <span className="h-2 rounded-full bg-paper-2">
                   <span className="block h-2 rounded-full bg-vermilion/70" style={{ width: `${(n / max) * 100}%` }} />
                 </span>
@@ -73,7 +81,7 @@ export function HabitsView() {
             {top.slice(0, 3).map(([id]) => {
               const c = CATEGORIES[id];
               return (
-                <article key={id} className="rounded-xl border border-rule bg-card p-4 text-sm">
+                <article key={id} className="rounded-[1.25rem] border border-rule bg-card p-4 text-sm">
                   <h4 className="mb-2 font-medium text-ink">
                     {c.label.en} <span className="text-ink-3">· {c.label[zh]}</span>
                   </h4>

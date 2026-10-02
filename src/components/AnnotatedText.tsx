@@ -24,6 +24,7 @@ export function AnnotatedText({
     parts.push(
       <mark
         key={a.id}
+        data-mark={a.id}
         role="button"
         tabIndex={0}
         aria-label={a.category}

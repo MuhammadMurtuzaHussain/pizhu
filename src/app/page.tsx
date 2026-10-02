@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "motion/react";
+import { BookBookmark, BookOpenText, Cloud, GithubLogo, Lock, Notebook, PencilSimpleLine, Warning } from "@phosphor-icons/react";
 import { useI18n, type ExplainLang } from "@/lib/i18n/context";
 import type { Locale } from "@/lib/i18n/messages";
 import type { EssayContext } from "@/lib/schema";
@@ -12,6 +14,8 @@ import { GlossaryView } from "@/components/GlossaryView";
 
 type Tab = "write" | "references" | "habits" | "glossary";
 type Status = { mode: "local" | "hosted"; model: string; ready: boolean; scholar: boolean; maxWords: number | null };
+
+const TAB_ICONS = { write: PencilSimpleLine, references: BookOpenText, habits: Notebook, glossary: BookBookmark } as const;
 
 const LOCALE_LABELS: [Locale, string][] = [
   ["en", "EN"],
@@ -39,32 +43,38 @@ export default function Home() {
       .catch(() => setStatus(null));
   }, []);
 
+  const ModeIcon = !status?.ready ? Warning : status.mode === "local" ? Lock : Cloud;
+
   return (
-    <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-4 sm:px-6">
+    <div className="mx-auto flex min-h-[100dvh] max-w-[1240px] flex-col px-4 sm:px-6">
       <header className="flex flex-wrap items-center gap-x-4 gap-y-3 py-5">
         <div className="flex items-center gap-3">
-          {/* A seal (印章) in vermilion: the colour of traditional 批注 margin notes. */}
-          <div aria-hidden className="grid h-11 w-11 place-items-center rounded-md bg-vermilion text-[15px] font-semibold leading-none tracking-widest text-white shadow-sm [writing-mode:vertical-rl]">
+          {/* A seal (印章) in cinnabar: the colour of traditional 批注 margin notes. */}
+          <div
+            aria-hidden
+            className="grid h-11 w-11 place-items-center rounded-[10px] bg-vermilion font-kai text-[16px] leading-none tracking-widest text-white shadow-soft [writing-mode:vertical-rl]"
+          >
             批注
           </div>
           <div>
-            <h1 className="font-serif text-2xl leading-none text-ink">Pīzhù</h1>
+            <h1 translate="no" className="text-xl font-semibold leading-none tracking-tight text-ink">Pīzhù</h1>
             <p className="mt-1 text-xs text-ink-3">{t.brandTag}</p>
           </div>
         </div>
 
         {status && (
           <span
-            className={`rounded-full px-3 py-1 text-xs ${
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs ${
               !status.ready ? "bg-must-bg text-must" : status.mode === "local" ? "bg-ok-bg text-ok" : "bg-style-bg text-style"
             }`}
             title={status.model}
           >
-            {!status.ready ? `${t.mode.notReady} · ${status.model}` : status.mode === "local" ? `🔒 ${t.mode.local}` : `☁︎ ${t.mode.hosted}`}
+            <ModeIcon size={13} weight="bold" aria-hidden />
+            {!status.ready ? `${t.mode.notReady} · ${status.model}` : status.mode === "local" ? t.mode.local : t.mode.hosted}
           </span>
         )}
 
-        <div className="ml-auto flex items-center gap-3 text-xs">
+        <div className="ml-auto flex items-center gap-2 text-xs">
           <Segmented
             label={t.explainIn}
             value={explain}
@@ -76,30 +86,48 @@ export default function Home() {
       </header>
 
       <nav className="mb-8 flex gap-1 overflow-x-auto border-b border-rule [scrollbar-width:none]" aria-label="Sections">
-        {(Object.keys(t.tabs) as Tab[]).map((k) => (
-          <button
-            key={k}
-            onClick={() => setTab(k)}
-            aria-current={tab === k ? "page" : undefined}
-            className={`-mb-px whitespace-nowrap border-b-2 px-3 py-2.5 text-sm ${
-              tab === k ? "border-vermilion text-ink" : "border-transparent text-ink-3 hover:text-ink-2"
-            }`}
-          >
-            {t.tabs[k]}
-          </button>
-        ))}
+        {(Object.keys(t.tabs) as Tab[]).map((k) => {
+          const Icon = TAB_ICONS[k];
+          const active = tab === k;
+          return (
+            <button
+              key={k}
+              onClick={() => setTab(k)}
+              aria-current={active ? "page" : undefined}
+              className={`relative inline-flex items-center gap-1.5 whitespace-nowrap px-3 py-3 text-sm transition-colors ${
+                active ? "text-ink" : "text-ink-3 hover:text-ink-2"
+              }`}
+            >
+              <Icon size={16} weight={active ? "regular" : "light"} aria-hidden />
+              {t.tabs[k]}
+              {active && (
+                <motion.span
+                  layoutId="tab-underline"
+                  className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-vermilion"
+                  transition={{ type: "spring", stiffness: 400, damping: 34 }}
+                />
+              )}
+            </button>
+          );
+        })}
       </nav>
 
-      <main className="flex-1 pb-16">
+      <main className="flex-1 pb-20">
         {tab === "write" && <WriteView text={text} setText={setText} context={context} setContext={setContext} analysis={analysis} status={status} />}
         {tab === "references" && <ReferencesView text={text} />}
         {tab === "habits" && <HabitsView />}
         {tab === "glossary" && <GlossaryView />}
       </main>
 
-      <footer className="border-t border-rule py-5 text-xs text-ink-3">
-        {t.footer}{" "}
-        <a href="https://github.com/MuhammadMurtuzaHussain/pizhu" className="underline underline-offset-2" target="_blank" rel="noreferrer">
+      <footer className="flex items-center gap-2 border-t border-rule py-5 text-xs text-ink-3">
+        {t.footer}
+        <a
+          href="https://github.com/MuhammadMurtuzaHussain/pizhu"
+          className="inline-flex items-center gap-1 underline-offset-2 hover:text-ink-2 hover:underline"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <GithubLogo size={14} aria-hidden />
           GitHub
         </a>
       </footer>
@@ -119,14 +147,14 @@ function Segmented({
   options: [string, string][];
 }) {
   return (
-    <div role="radiogroup" aria-label={label} className="flex rounded-lg border border-rule bg-card p-0.5">
+    <div role="radiogroup" aria-label={label} className="flex rounded-full border border-rule bg-card p-0.5">
       {options.map(([k, v]) => (
         <button
           key={k}
           role="radio"
           aria-checked={value === k}
           onClick={() => onChange(k)}
-          className={`rounded-md px-2.5 py-1 ${value === k ? "bg-ink text-paper" : "text-ink-2 hover:bg-paper-2"}`}
+          className={`rounded-full px-2.5 py-1 transition-colors ${value === k ? "bg-ink text-paper" : "text-ink-2 hover:bg-paper-2"}`}
         >
           {v}
         </button>

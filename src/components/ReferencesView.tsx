@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n/context";
 import type { ReferencesResult } from "@/mastra/workflows/references";
+import { Momo } from "./Momo";
 
 const statusStyle = {
   found: "bg-ok-bg text-ok",
@@ -10,7 +11,7 @@ const statusStyle = {
   not_found: "bg-must-bg text-must",
   unchecked: "bg-paper-2 text-ink-3",
 } as const;
-const statusIcon = { found: "✓", mismatch: "≈", not_found: "?", unchecked: "–" } as const;
+const statusIcon = { found: "✓", mismatch: "≈", not_found: "?", unchecked: "·" } as const;
 
 export function ReferencesView({ text }: { text: string }) {
   const { t, script, explain } = useI18n();
@@ -31,19 +32,29 @@ export function ReferencesView({ text }: { text: string }) {
   const r = state.result;
   return (
     <section className="mx-auto max-w-3xl">
-      <p className="mb-1 font-serif text-lg text-ink-2">{t.refs.intro}</p>
+      <p className="mb-1 text-base text-ink-2">{t.refs.intro}</p>
       <p className="mb-5 text-xs text-ink-3">{t.refs.privacy}</p>
 
       {!text.trim() ? (
-        <p className="text-sm text-ink-3">{t.refs.needText}</p>
+        <div className="flex items-center gap-4 py-6">
+          <Momo state="thinking" size={88} />
+          <p className="text-sm text-ink-3">{t.refs.needText}</p>
+        </div>
       ) : (
         <button
           onClick={run}
           disabled={state.loading}
-          className="rounded-lg bg-vermilion px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-50"
+          className="rounded-full bg-vermilion px-5 py-2.5 text-sm font-medium text-white transition-transform active:scale-[0.98] disabled:opacity-50"
         >
-          {state.loading ? <span className="reading">{t.refs.running}</span> : t.refs.run}
+          {state.loading ? `${t.refs.running}…` : t.refs.run}
         </button>
+      )}
+
+      {state.loading && (
+        <div className="mt-6 flex items-center gap-3 text-sm text-ink-3">
+          <Momo state="reading" size={72} />
+          {t.refs.privacy}
+        </div>
       )}
 
       {state.error && <p className="mt-4 rounded-lg bg-must-bg px-4 py-3 text-sm text-must">{state.error}</p>}
@@ -53,7 +64,7 @@ export function ReferencesView({ text }: { text: string }) {
           {!r.scholarConfigured && <p className="text-sm text-ink-3">{t.refs.noScholar}</p>}
 
           {r.citedNotListed.length > 0 && (
-            <div className="rounded-xl border border-must/30 bg-must-bg/50 px-4 py-3 text-sm">
+            <div className="rounded-[1.25rem] border border-must/30 bg-must-bg/50 px-4 py-3 text-sm">
               <div className="mb-1 font-medium text-must">{t.refs.citedNotListed}</div>
               <ul className="list-inside list-disc text-ink">
                 {r.citedNotListed.map((c, i) => (
@@ -64,7 +75,7 @@ export function ReferencesView({ text }: { text: string }) {
           )}
 
           {r.refs.map((ref) => (
-            <article key={ref.index} className="rounded-xl border border-rule bg-card p-4">
+            <article key={ref.index} className="rounded-[1.25rem] border border-rule bg-card p-4">
               <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
                 <span className={`rounded-full px-2 py-0.5 font-medium ${statusStyle[ref.status]}`}>
                   {statusIcon[ref.status]} {t.refs.status[ref.status]}
@@ -87,7 +98,7 @@ export function ReferencesView({ text }: { text: string }) {
                   ) : (
                     ref.match.title
                   )}{" "}
-                  — {ref.match.summary}
+                  <span className="text-ink-3">({ref.match.summary})</span>
                 </p>
               )}
               {ref.status === "found" && ref.match?.link && (
