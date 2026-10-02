@@ -44,7 +44,7 @@ export function ReferencesView({ text }: { text: string }) {
         <button
           onClick={run}
           disabled={state.loading}
-          className="rounded-full bg-vermilion px-5 py-2.5 text-sm font-medium text-white transition-transform active:scale-[0.98] disabled:opacity-50"
+          className="rounded-full bg-taro px-5 py-2.5 text-sm font-medium text-on-taro transition-transform active:scale-[0.98] disabled:opacity-50"
         >
           {state.loading ? `${t.refs.running}…` : t.refs.run}
         </button>

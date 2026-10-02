@@ -51,7 +51,7 @@ export function NoteCard({
             }`
       }
     >
-      {/* A small vermilion seal lands on handled notes. */}
+      {/* A small taro seal lands on handled notes. */}
       <AnimatePresence>
         {resolved && (
           <motion.span
@@ -59,7 +59,7 @@ export function NoteCard({
             animate={{ scale: 1, opacity: 1, rotate: -8 }}
             exit={{ opacity: 0 }}
             transition={{ type: "spring", stiffness: 320, damping: 18 }}
-            className="absolute -top-2 right-3 grid h-8 w-8 place-items-center rounded-md border-2 border-vermilion bg-card text-vermilion"
+            className="absolute -top-2 right-3 grid h-8 w-8 place-items-center rounded-md border-2 border-taro bg-card text-taro"
             aria-label={t.card.resolved}
           >
             <Check size={16} weight="bold" aria-hidden />
@@ -98,8 +98,8 @@ export function NoteCard({
             <div className="space-y-3 pt-2">
               {showEn && showZh && <p className="font-kai text-[15.5px] leading-relaxed text-ink-2">{a.explanation_zh}</p>}
               {a.l1_note && showZh && (
-                <div className="rounded-xl bg-vermilion-soft/70 px-3.5 py-2.5">
-                  <div className="mb-0.5 text-xs font-medium text-vermilion">{t.card.why}</div>
+                <div className="rounded-xl bg-taro-soft/70 px-3.5 py-2.5">
+                  <div className="mb-0.5 text-xs font-medium text-taro">{t.card.why}</div>
                   <p className="font-kai text-[15px] leading-relaxed text-ink">{a.l1_note}</p>
                 </div>
               )}

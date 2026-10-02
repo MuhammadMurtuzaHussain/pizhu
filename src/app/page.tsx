@@ -7,6 +7,9 @@ import { useI18n, type ExplainLang } from "@/lib/i18n/context";
 import type { Locale } from "@/lib/i18n/messages";
 import type { EssayContext } from "@/lib/schema";
 import { useAnalysis } from "@/lib/useAnalysis";
+import { MomoProvider } from "@/lib/momo";
+import { MomoDock } from "@/components/MomoDock";
+import { Welcome } from "@/components/Welcome";
 import { WriteView } from "@/components/WriteView";
 import { ReferencesView } from "@/components/ReferencesView";
 import { HabitsView } from "@/components/HabitsView";
@@ -24,6 +27,14 @@ const LOCALE_LABELS: [Locale, string][] = [
 ];
 
 export default function Home() {
+  return (
+    <MomoProvider>
+      <App />
+    </MomoProvider>
+  );
+}
+
+function App() {
   const { t, locale, setLocale, explain, setExplain } = useI18n();
   const [tab, setTab] = useState<Tab>("write");
   const [text, setText] = useState("");
@@ -35,6 +46,7 @@ export default function Home() {
   });
   const [status, setStatus] = useState<Status | null>(null);
   const analysis = useAnalysis();
+  const [lessonOpen, setLessonOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/status")
@@ -49,15 +61,15 @@ export default function Home() {
     <div className="mx-auto flex min-h-[100dvh] max-w-[1240px] flex-col px-4 sm:px-6">
       <header className="flex flex-wrap items-center gap-x-4 gap-y-3 py-5">
         <div className="flex items-center gap-3">
-          {/* A seal (印章) in cinnabar: the colour of traditional 批注 margin notes. */}
+          {/* A seal (印章) sticker: the 批注 mark, in taro. */}
           <div
             aria-hidden
-            className="grid h-11 w-11 place-items-center rounded-[10px] bg-vermilion font-kai text-[16px] leading-none tracking-widest text-white shadow-soft [writing-mode:vertical-rl]"
+            className="sticker grid h-11 w-11 -rotate-3 place-items-center rounded-[12px] bg-taro font-kai text-[16px] leading-none tracking-widest text-on-taro [writing-mode:vertical-rl]"
           >
             批注
           </div>
           <div>
-            <h1 translate="no" className="text-xl font-semibold leading-none tracking-tight text-ink">Pīzhù</h1>
+            <h1 translate="no" className="text-2xl font-bold leading-none tracking-tight text-ink">Pīzhù</h1>
             <p className="mt-1 text-xs text-ink-3">{t.brandTag}</p>
           </div>
         </div>
@@ -103,7 +115,7 @@ export default function Home() {
               {active && (
                 <motion.span
                   layoutId="tab-underline"
-                  className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-vermilion"
+                  className="absolute inset-x-2 -bottom-px h-[3px] rounded-full bg-taro"
                   transition={{ type: "spring", stiffness: 400, damping: 34 }}
                 />
               )}
@@ -113,13 +125,16 @@ export default function Home() {
       </nav>
 
       <main className="flex-1 pb-20">
-        {tab === "write" && <WriteView text={text} setText={setText} context={context} setContext={setContext} analysis={analysis} status={status} />}
+        {tab === "write" && <WriteView text={text} setText={setText} context={context} setContext={setContext} analysis={analysis} status={status} onLessonChange={setLessonOpen} />}
         {tab === "references" && <ReferencesView text={text} />}
         {tab === "habits" && <HabitsView />}
         {tab === "glossary" && <GlossaryView />}
       </main>
 
-      <footer className="flex items-center gap-2 border-t border-rule py-5 text-xs text-ink-3">
+      <MomoDock hidden={lessonOpen} />
+      <Welcome />
+
+      <footer className="flex items-center gap-2 border-t border-rule py-5 pr-28 text-xs text-ink-3">
         {t.footer}
         <a
           href="https://github.com/MuhammadMurtuzaHussain/pizhu"

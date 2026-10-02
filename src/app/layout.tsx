@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { GeistSans } from "geist/font/sans";
-import { Newsreader } from "next/font/google";
+import { Newsreader, Outfit } from "next/font/google";
 import { I18nProvider } from "@/lib/i18n/context";
 // 霞鹜文楷 Lite, split by unicode-range so only the characters on screen load.
 import "lxgw-wenkai-lite-webfont/lxgwwenkailite-regular.css";
 import "./globals.css";
 
+const ui = Outfit({ variable: "--font-ui", subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 const essay = Newsreader({ variable: "--font-essay", subsets: ["latin"], style: ["normal", "italic"] });
 
 export const metadata: Metadata = {
@@ -15,14 +15,14 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f3f3ee" },
-    { media: "(prefers-color-scheme: dark)", color: "#131416" },
+    { media: "(prefers-color-scheme: light)", color: "#faf8ff" },
+    { media: "(prefers-color-scheme: dark)", color: "#16121e" },
   ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${essay.variable} h-full antialiased`}>
+    <html lang="en" className={`${ui.variable} ${essay.variable} h-full antialiased`}>
       <body className="min-h-full font-sans">
         <I18nProvider>{children}</I18nProvider>
       </body>

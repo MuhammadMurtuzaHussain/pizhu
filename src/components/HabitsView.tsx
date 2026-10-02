@@ -69,7 +69,7 @@ export function HabitsView() {
                   <span className="truncate">{CATEGORIES[id].label[L]}</span>
                 </span>
                 <span className="h-2 rounded-full bg-paper-2">
-                  <span className="block h-2 rounded-full bg-vermilion/70" style={{ width: `${(n / max) * 100}%` }} />
+                  <span className="block h-2 rounded-full bg-taro/70" style={{ width: `${(n / max) * 100}%` }} />
                 </span>
                 <span className="tabular-nums text-ink-3">{n}</span>
               </li>

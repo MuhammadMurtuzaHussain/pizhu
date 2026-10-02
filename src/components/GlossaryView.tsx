@@ -17,7 +17,7 @@ export function GlossaryView() {
           return (
             <article key={id} className="rounded-[1.25rem] border border-rule bg-card p-5">
               <h3 className="mb-3 flex items-baseline gap-2">
-                <CategoryIcon id={id} size={20} className="self-center text-vermilion" />
+                <CategoryIcon id={id} size={20} className="self-center text-taro" />
                 <span className="font-medium text-ink">{c.label.en}</span>
                 <span className="text-ink-2">{c.label[zh]}</span>
               </h3>

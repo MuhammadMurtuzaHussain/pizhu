@@ -1,53 +1,63 @@
 @import "tailwindcss";
 
-/* Pīzhù palette, named after 中国传统色 (traditional Chinese colours).
-   宣纸 xuan paper and 墨 ink as the base, one accent: 朱砂 cinnabar, the ink of
-   朱批 margin corrections. Gold (金) is reserved for celebration moments. */
+/* Pīzhù 珍奶 palette: a Taiwanese bubble-tea counter.
+   Milk white base, 芋头 taro as the one brand accent, tapioca for text.
+   Severities borrow from the menu: strawberry milk (must fix), mango (worth
+   fixing), earl grey (style), matcha (all good). Mango + strawberry also
+   carry celebrations. */
 :root {
   color-scheme: light dark;
-  --paper: #f3f3ee;        /* 宣纸 xuan paper */
-  --paper-2: #e9e9e2;      /* 浅宣 */
-  --card: #fcfcf9;
-  --ink: #1f2124;          /* 墨 ink, a blue-black */
-  --ink-2: #4a4d52;        /* 淡墨 */
-  --ink-3: #74777d;        /* 宿墨 */
-  --rule: #dcdcd4;
-  --vermilion: #c8341f;    /* 朱砂 cinnabar: brand + must-fix */
-  --vermilion-soft: #f8e3dd;
-  --must: #c8341f;
-  --must-bg: #f8e3dd;
-  --worth: #9a6512;        /* 藤黄 gamboge */
-  --worth-bg: #f5ead3;
-  --style: #3f5f7f;        /* 黛蓝 indigo */
-  --style-bg: #e1e8ef;
-  --ok: #3d7a61;           /* 青瓷 celadon */
-  --ok-bg: #dfeee6;
-  --gold: #c08a1e;         /* 金, celebration only */
-  --focus: #2f5bd3;
-  --shadow: 32 33 36;
+  --paper: #faf8ff;          /* milk white */
+  --paper-2: #f1ecfc;        /* taro foam */
+  --card: #ffffff;
+  --ink: #2a2233;            /* tapioca */
+  --ink-2: #5a5166;
+  --ink-3: #857c92;
+  --rule: #e6e0f2;
+  --taro: #7353cf;           /* 芋头 taro, brand + primary actions */
+  --taro-soft: #eee8ff;
+  --taro-2: #b8a4f2;
+  --on-taro: #ffffff;
+  --berry: #f2b8c6;          /* strawberry milk, decorative */
+  --must: #cf3f68;           /* strawberry */
+  --must-bg: #fde6ee;
+  --worth: #9a6a00;          /* mango */
+  --worth-bg: #fff2c7;
+  --mango: #f5d66b;
+  --style: #4f6187;          /* earl grey */
+  --style-bg: #e7ebf6;
+  --ok: #4b8636;             /* matcha */
+  --ok-bg: #e5f2dc;
+  --grid: rgb(115 83 207 / 0.07);
+  --focus: #5b3fd1;
+  --shadow: 42 34 51;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #131416;      /* 墨夜 ink night */
-    --paper-2: #1b1c1f;
-    --card: #1f2023;
-    --ink: #ecebe5;
-    --ink-2: #bdbcb5;
-    --ink-3: #8b8a85;
-    --rule: #303135;
-    --vermilion: #ee6a52;
-    --vermilion-soft: #3a1f1a;
-    --must: #ee6a52;
-    --must-bg: #3a1f1a;
-    --worth: #e2b04a;
-    --worth-bg: #33291a;
-    --style: #93b1d3;
-    --style-bg: #1d2834;
-    --ok: #7cc4a2;
-    --ok-bg: #18291f;
-    --gold: #e6b84d;
-    --focus: #93b4ff;
+    --paper: #16121e;        /* taro night */
+    --paper-2: #1f1929;
+    --card: #231c2f;
+    --ink: #f4f0fb;
+    --ink-2: #cbc2d9;
+    --ink-3: #9a90ab;
+    --rule: #352c45;
+    --taro: #a68cf2;
+    --taro-soft: #2e2445;
+    --taro-2: #6f58b8;
+    --on-taro: #1a1426;
+    --berry: #8a4f63;
+    --must: #ff7fa3;
+    --must-bg: #3b1d2a;
+    --worth: #f3c84b;
+    --worth-bg: #33290f;
+    --mango: #e8c457;
+    --style: #a5b5da;
+    --style-bg: #212a3d;
+    --ok: #93d27c;
+    --ok-bg: #1c2a17;
+    --grid: rgb(166 140 242 / 0.08);
+    --focus: #c2b2ff;
     --shadow: 0 0 0;
   }
 }
@@ -60,8 +70,12 @@
   --color-ink-2: var(--ink-2);
   --color-ink-3: var(--ink-3);
   --color-rule: var(--rule);
-  --color-vermilion: var(--vermilion);
-  --color-vermilion-soft: var(--vermilion-soft);
+  --color-taro: var(--taro);
+  --color-taro-soft: var(--taro-soft);
+  --color-taro-2: var(--taro-2);
+  --color-on-taro: var(--on-taro);
+  --color-berry: var(--berry);
+  --color-mango: var(--mango);
   --color-must: var(--must);
   --color-must-bg: var(--must-bg);
   --color-worth: var(--worth);
@@ -70,11 +84,10 @@
   --color-style-bg: var(--style-bg);
   --color-ok: var(--ok);
   --color-ok-bg: var(--ok-bg);
-  --color-gold: var(--gold);
-  --font-sans: var(--font-geist-sans), "PingFang SC", "PingFang TC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+  --font-sans: var(--font-ui), "PingFang SC", "PingFang TC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
   /* The essay is a manuscript, so it is the one place a serif belongs. */
   --font-serif: var(--font-essay), "Songti SC", "Songti TC", "Noto Serif CJK SC", Georgia, serif;
-  /* 霞鹜文楷: reads like a teacher's handwriting, used for Chinese explanations. */
+  /* 霞鹜文楷: a friendly handwritten kai, used for Chinese explanations. */
   --font-kai: "LXGW WenKai Lite", "Kaiti SC", "Kaiti TC", "STKaiti", "BiauKai", serif;
   --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -108,44 +121,47 @@ select,
   touch-action: manipulation;
 }
 
-/* Shadows are tinted to the ink, never pure black. */
+/* Soft, tinted shadows; never pure black. */
 .shadow-soft {
-  box-shadow: 0 1px 2px rgb(var(--shadow) / 0.04), 0 12px 32px -12px rgb(var(--shadow) / 0.12);
+  box-shadow: 0 1px 2px rgb(var(--shadow) / 0.05), 0 14px 34px -14px rgb(var(--shadow) / 0.18);
+}
+.shadow-lift {
+  box-shadow: 0 2px 4px rgb(var(--shadow) / 0.06), 0 24px 48px -18px rgb(var(--shadow) / 0.28);
 }
 
-/* Double-bezel: an outer tray holding an inner plate. */
-.bezel {
-  border-radius: 1.75rem;
-  padding: 0.375rem;
-  background: rgb(var(--shadow) / 0.035);
-  box-shadow: inset 0 0 0 1px rgb(var(--shadow) / 0.06);
+/* 方格纸: the essay sits on study-notebook grid paper. */
+.grid-paper {
+  background-color: var(--card);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: -1px -1px;
 }
-.bezel > .bezel-core {
-  border-radius: calc(1.75rem - 0.375rem);
-  background: var(--card);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6), 0 1px 2px rgb(var(--shadow) / 0.05);
+
+/* Stickers: white die-cut border, slight tilt, like a 小红书 study page. */
+.sticker {
+  border: 3px solid #fff;
+  box-shadow: 0 6px 14px -6px rgb(var(--shadow) / 0.3);
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .bezel {
-    background: rgb(255 255 255 / 0.03);
-    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06);
-  }
-  :root:not([data-theme="light"]) .bezel > .bezel-core {
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05);
+  :root:not([data-theme="light"]) .sticker {
+    border-color: #3a3049;
   }
 }
 
-/* Annotated spans: a soft underline, washed with colour when active. */
+/* Annotated spans: a soft marker-pen underline, washed with colour when active. */
 .mark {
-  border-radius: 3px;
+  border-radius: 4px;
   cursor: pointer;
   text-decoration-line: underline;
-  text-decoration-thickness: 2px;
+  text-decoration-thickness: 2.5px;
   text-underline-offset: 5px;
+  text-decoration-skip-ink: none;
   transition: background-color 180ms var(--ease-spring);
 }
 .mark[data-sev="must_fix"] { text-decoration-color: var(--must); }
-.mark[data-sev="worth_fixing"] { text-decoration-color: var(--worth); text-decoration-style: dashed; }
+.mark[data-sev="worth_fixing"] { text-decoration-color: var(--worth); text-decoration-style: wavy; text-decoration-thickness: 1.5px; }
 .mark[data-sev="style"] { text-decoration-color: var(--style); text-decoration-style: dotted; }
 .mark:hover[data-sev="must_fix"], .mark[data-active="true"][data-sev="must_fix"] { background: var(--must-bg); }
 .mark:hover[data-sev="worth_fixing"], .mark[data-active="true"][data-sev="worth_fixing"] { background: var(--worth-bg); }
@@ -158,18 +174,18 @@ select,
   field-sizing: content;
   background: transparent;
   border: 0;
-  border-bottom: 1.5px dashed var(--ink-3);
+  border-bottom: 2px dotted var(--taro-2);
   border-radius: 0;
-  color: var(--ink);
-  font-weight: 500;
+  color: var(--taro);
+  font-weight: 600;
   padding: 0 1.1rem 1px 0.1rem;
   cursor: pointer;
-  background-image: linear-gradient(45deg, transparent 50%, var(--ink-3) 50%), linear-gradient(135deg, var(--ink-3) 50%, transparent 50%);
+  background-image: linear-gradient(45deg, transparent 50%, var(--taro) 50%), linear-gradient(135deg, var(--taro) 50%, transparent 50%);
   background-position: calc(100% - 7px) 55%, calc(100% - 3px) 55%;
   background-size: 4px 4px;
   background-repeat: no-repeat;
 }
-.word-select:hover { border-bottom-color: var(--vermilion); }
+.word-select:hover { border-bottom-color: var(--taro); }
 .word-select option { background: var(--card); color: var(--ink); }
 
 @keyframes shimmer {
@@ -177,7 +193,7 @@ select,
   100% { background-position: 200% 0; }
 }
 .reading {
-  background: linear-gradient(90deg, transparent 0%, rgb(var(--shadow) / 0.06) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgb(115 83 207 / 0.1) 50%, transparent 100%);
   background-size: 200% 100%;
   animation: shimmer 2.2s var(--ease-spring) infinite;
   border-radius: 6px;

@@ -2,16 +2,19 @@
 
 import { AnimatePresence, motion, useReducedMotion, type TargetAndTransition } from "motion/react";
 
-// 墨墨 Mòmo, the ink panda. Black and white is literally 墨 ink on 宣纸 paper,
-// and the vermilion brush is the 朱批 correction ink. Built from simple shapes
-// so each mood can animate; the panda keeps its own fixed colours in dark mode.
+// 墨墨 Mòmo, the ink panda. Black and white is literally 墨 ink on paper; Mòmo
+// writes with a taro brush and, off duty, holds a bubble tea (珍奶). Built from
+// simple shapes so each mood can animate; the panda keeps its own fixed colours
+// in dark mode.
 
 export type MomoState = "idle" | "reading" | "thinking" | "happy" | "stamp" | "sleepy";
 
 const INK = "#23252a";
 const FUR = "#fbfaf6";
-const CINNABAR = "#c8341f";
+const BLUSH = "#f39bb4";
+const TARO = "#7353cf";
 const BAMBOO = "#9b7a48";
+const TEA = "#c9b3f0";
 
 const spring = { type: "spring" as const, stiffness: 140, damping: 16 };
 
@@ -119,8 +122,8 @@ export function Momo({
       </AnimatePresence>
 
       {/* blush, nose, mouth */}
-      <circle cx="46" cy="92" r="7" fill={CINNABAR} opacity="0.22" />
-      <circle cx="114" cy="92" r="7" fill={CINNABAR} opacity="0.22" />
+      <circle cx="46" cy="92" r="7" fill={BLUSH} opacity="0.55" />
+      <circle cx="114" cy="92" r="7" fill={BLUSH} opacity="0.55" />
       <ellipse cx="80" cy="86" rx="6" ry="4.2" fill={INK} />
       {state === "happy" || state === "stamp" ? (
         <path d="M73 92 Q80 101 87 92 Z" fill={INK} />
@@ -130,15 +133,32 @@ export function Momo({
         <path d="M74 93 Q77 97 80 93 Q83 97 86 93" stroke={INK} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
       )}
 
-      {/* right paw with the vermilion brush */}
-      <motion.g
-        animate={state === "reading" ? loop({ rotate: [0, -8, 0, -5, 0], transition: { duration: 1.4, repeat: Infinity } }) : { rotate: 0 }}
-        style={{ transformBox: "fill-box", transformOrigin: "30% 70%" }}
-      >
-        <line x1="130" y1="90" x2="111" y2="134" stroke={BAMBOO} strokeWidth="4.5" strokeLinecap="round" />
-        <path d="M111 134 Q106 146 104 150 Q112 146 115 136 Z" fill={CINNABAR} />
-        <ellipse cx="116" cy="118" rx="12" ry="15" transform="rotate(28 116 118)" fill={INK} />
-      </motion.g>
+      {/* right paw: a taro brush while working, a bubble tea while relaxed */}
+      {state === "reading" || state === "thinking" ? (
+        <motion.g
+          animate={state === "reading" ? loop({ rotate: [0, -8, 0, -5, 0], transition: { duration: 1.4, repeat: Infinity } }) : { rotate: 0 }}
+          style={{ transformBox: "fill-box", transformOrigin: "30% 70%" }}
+        >
+          <line x1="130" y1="90" x2="111" y2="134" stroke={BAMBOO} strokeWidth="4.5" strokeLinecap="round" />
+          <path d="M111 134 Q106 146 104 150 Q112 146 115 136 Z" fill={TARO} />
+          <ellipse cx="116" cy="118" rx="12" ry="15" transform="rotate(28 116 118)" fill={INK} />
+        </motion.g>
+      ) : (
+        <motion.g
+          animate={state === "happy" ? loop({ rotate: [0, 6, 0], transition: { duration: 0.6, repeat: Infinity, repeatDelay: 1.4 } }) : { rotate: 0 }}
+          style={{ transformBox: "fill-box", transformOrigin: "50% 100%" }}
+        >
+          <line x1="126" y1="88" x2="132" y2="70" stroke={TARO} strokeWidth="3.5" strokeLinecap="round" />
+          <path d="M112 92 L140 92 L136 132 Q126 136 116 132 Z" fill="#ffffff" stroke={INK} strokeOpacity="0.18" strokeWidth="1.5" />
+          <path d="M113.5 104 L138.5 104 L136 132 Q126 136 116 132 Z" fill={TEA} />
+          <circle cx="120" cy="127" r="2.6" fill={INK} />
+          <circle cx="127" cy="129" r="2.6" fill={INK} />
+          <circle cx="133" cy="126" r="2.6" fill={INK} />
+          <circle cx="124" cy="122" r="2.6" fill={INK} />
+          <rect x="110" y="88" width="32" height="5" rx="2.5" fill={TARO} />
+          <ellipse cx="114" cy="120" rx="11" ry="13" transform="rotate(20 114 120)" fill={INK} />
+        </motion.g>
+      )}
 
       {/* left paw: holds the seal when stamping */}
       <motion.g
@@ -147,7 +167,7 @@ export function Momo({
         <ellipse cx="44" cy="118" rx="12" ry="15" transform="rotate(-28 44 118)" fill={INK} />
         {state === "stamp" && (
           <g>
-            <rect x="22" y="128" width="26" height="22" rx="3" fill={CINNABAR} />
+            <rect x="22" y="128" width="26" height="22" rx="5" fill={TARO} />
             <text x="35" y="144" textAnchor="middle" fontSize="15" fontWeight="700" fill={FUR} style={{ fontFamily: "var(--font-kai)" }}>
               好
             </text>
