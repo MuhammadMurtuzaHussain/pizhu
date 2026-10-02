@@ -13,12 +13,13 @@ import { mergeAnnotations, spellingAnnotations } from "@/lib/spelling";
  */
 export async function analyzeParagraph(ctx: EssayContext, paragraph: string, index: number, total: number, id: string) {
   const prompt = paragraphPrompt(ctx, paragraph, index, total);
-  const { mode } = getModelConfig();
+  const { mode, providerOptions } = getModelConfig();
 
   const attempt = async (inject: boolean): Promise<ModelParagraph> => {
     const res = await tutorAgent.generate(prompt, {
       structuredOutput: { schema: modelParagraphSchema, jsonPromptInjection: inject },
       modelSettings: { temperature: 0.2, maxOutputTokens: 4096 },
+      providerOptions,
     });
     if (!res.object) throw new Error("Model returned no structured output");
     return res.object as ModelParagraph;

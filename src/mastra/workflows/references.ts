@@ -28,10 +28,16 @@ const extractStep = createStep({
     const res = await librarianAgent.generate(`Write tips_zh in ${scriptName}.\n\n<reference_list>\n${list}\n</reference_list>`, {
       structuredOutput: { schema: extractedRefsSchema, jsonPromptInjection: getModelConfig().mode === "hosted" },
       modelSettings: { temperature: 0.1, maxOutputTokens: 4096 },
+      providerOptions: getModelConfig().providerOptions,
     });
-    const parsed = ((res.object as z.infer<typeof extractedRefsSchema> | undefined)?.references ?? []).filter(
-      (r) => r.index >= 0 && r.index < references.length,
-    );
+    // Small models sometimes write "No issues" as a hint; an empty list means the same thing.
+    const noIssue = /^(no (visible )?(issues?|problems?)|none|looks (fine|good|correct)|没有|沒有|无|無)/i;
+    const parsed = ((res.object as z.infer<typeof extractedRefsSchema> | undefined)?.references ?? [])
+      .filter((r) => r.index >= 0 && r.index < references.length)
+      .map((r) => {
+        const keep = r.tips_en.map((t) => !noIssue.test(t.trim()));
+        return { ...r, tips_en: r.tips_en.filter((_, i) => keep[i]), tips_zh: r.tips_zh.filter((_, i) => keep[i] ?? true).filter((t) => !noIssue.test(t.trim())) };
+      });
     return { body, references, parsed };
   },
 });
@@ -82,17 +88,32 @@ export const referencesOutputSchema = z.object({
 });
 export type ReferencesResult = z.infer<typeof referencesOutputSchema>;
 
+const STOP = new Set(["the", "and", "for", "with", "from", "into", "its", "their", "how", "what", "why", "a", "an", "of", "in", "on", "to"]);
 const tokens = (s: string) =>
-  new Set(s.toLowerCase().normalize("NFKD").replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w.length > 2));
+  new Set(
+    s.toLowerCase().normalize("NFKD").replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w.length > 2 && !STOP.has(w)),
+  );
 
-/** Dice coefficient over word sets: 1 = same words. */
-export function titleSimilarity(a: string, b: string): number {
+const dice = (a: string, b: string) => {
   const x = tokens(a);
   const y = tokens(b);
   if (!x.size || !y.size) return 0;
   let inter = 0;
   for (const w of x) if (y.has(w)) inter++;
   return (2 * inter) / (x.size + y.size);
+};
+
+const mainTitle = (t: string) => t.split(/[:?.]/)[0];
+
+/**
+ * 1 = same title. Compares full titles and main titles (before a colon), since
+ * Scholar often drops subtitles: "Understanding media" vs "Understanding Media:
+ * The Extensions of Man".
+ */
+export function titleSimilarity(ref: string, result: string): number {
+  const full = dice(ref, result);
+  const main = tokens(mainTitle(ref)).size >= 2 ? dice(mainTitle(ref), mainTitle(result)) : 0;
+  return Math.max(full, main);
 }
 
 async function verify(ref: ExtractedRef, raw: string, cited: number): Promise<{ configured: boolean; checked: CheckedRef }> {
@@ -102,19 +123,24 @@ async function verify(ref: ExtractedRef, raw: string, cited: number): Promise<{ 
   const { configured, results } = await searchScholar(q);
   if (!configured) return { configured, checked: { ...base, status: "unchecked" } };
 
-  const best = results
-    .map((r) => ({ r, score: titleSimilarity(ref.title, r.title) }))
-    .sort((a, b) => b.score - a.score)[0];
-  if (!best || best.score < 0.6) return { configured, checked: { ...base, status: "not_found", match: best?.r ?? null } };
+  const ranked = results.map((r) => ({ r, score: titleSimilarity(ref.title, r.title) })).sort((a, b) => b.score - a.score);
+  const strong = ranked.filter((x) => x.score >= 0.6);
+  if (!strong.length) return { configured, checked: { ...base, status: "not_found", match: ranked[0]?.r ?? null } };
 
-  const issues: ("year" | "author")[] = [];
+  // Any strong match can confirm the details (the top hit is sometimes a review of the work).
   const year = ref.year?.match(/\d{4}/)?.[0];
-  if (year && !best.r.summary.includes(year)) issues.push("year");
-  const first = ref.surnames[0];
-  // Scholar abbreviates names ("M Castells"); only check individuals, not organisations.
-  if (first && ref.surnames.length > 0 && best.r.summary && !best.r.summary.toLowerCase().includes(first.toLowerCase()) && /[a-z]/.test(first.slice(1))) {
-    issues.push("author");
-  }
+  const first = ref.surnames[0]?.toLowerCase();
+  const text = (x: (typeof strong)[number]) => `${x.r.summary} ${x.r.title}`.toLowerCase();
+  const yearOk = !year || strong.some((x) => text(x).includes(year));
+  // Only check individual surnames; organisations (Ofcom, WHO) are often listed differently.
+  const authorOk = !first || /^[A-Z]{2,}$/.test(ref.surnames[0]) || strong.some((x) => text(x).includes(first));
+  // Prefer a hit whose metadata line (not its title) names the author and year: the work itself, not a review of it.
+  const meta = (x: (typeof strong)[number]) => x.r.summary.toLowerCase();
+  const best =
+    strong.find((x) => (!year || meta(x).includes(year)) && (!first || meta(x).includes(first))) ??
+    strong.find((x) => (!year || text(x).includes(year)) && (!first || text(x).includes(first))) ??
+    strong[0];
+  const issues: ("year" | "author")[] = [...(yearOk ? [] : ["year" as const]), ...(authorOk ? [] : ["author" as const])];
   return { configured, checked: { ...base, status: issues.length ? "mismatch" : "found", issues, match: best.r } };
 }
 

@@ -29,3 +29,16 @@ describe("splitEssay", () => {
     expect(s.references).toHaveLength(2);
   });
 });
+
+import { titleSimilarity } from "@/mastra/workflows/references";
+
+describe("titleSimilarity", () => {
+  it("matches when Scholar drops the subtitle", () => {
+    expect(titleSimilarity("Understanding Media: The Extensions of Man", "Understanding media")).toBeGreaterThanOrEqual(0.6);
+  });
+  it("does not match a different work on a similar topic", () => {
+    expect(
+      titleSimilarity("The Algorithmic Mirror: TikTok and the Self in Generation Z", "# GenZ on TikTok: the collective online self-portrait of the social media generation"),
+    ).toBeLessThan(0.6);
+  });
+});

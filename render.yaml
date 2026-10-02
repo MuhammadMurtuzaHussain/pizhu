@@ -12,7 +12,7 @@ services:
       - key: MODEL_PROVIDER
         value: google
       - key: GOOGLE_MODEL
-        value: gemma-4-31b-it
+        value: gemma-4-26b-a4b-it
       - key: GOOGLE_GENERATIVE_AI_API_KEY
         sync: false
       - key: SERPAPI_API_KEY

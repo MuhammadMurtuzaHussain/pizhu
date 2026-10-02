@@ -1,17 +1,17 @@
 {
   "summary": {
-    "model": "gemma4:e4b",
+    "model": "gemma4:12b",
     "mode": "local",
-    "recall": 0.842,
-    "cleanParagraphMustFix": 1,
-    "avgSecondsPerParagraph": 12.8,
+    "recall": 0.947,
+    "cleanParagraphMustFix": 0,
+    "avgSecondsPerParagraph": 34.1,
     "guard": {
-      "proposed": 44,
-      "kept": 37,
-      "droppedUnlocated": 0,
-      "droppedOverlap": 7,
-      "nudgesProposed": 31,
-      "nudgesStripped": 7
+      "proposed": 58,
+      "kept": 48,
+      "droppedUnlocated": 1,
+      "droppedOverlap": 9,
+      "nudgesProposed": 24,
+      "nudgesStripped": 0
     }
   },
   "rows": [
@@ -22,10 +22,10 @@
       ],
       "missed": [],
       "extra": [
-        "register"
+        "hedging"
       ],
-      "must": 2,
-      "ms": 16698
+      "must": 1,
+      "ms": 59273
     },
     {
       "id": "countability-1",
@@ -35,7 +35,7 @@
       "missed": [],
       "extra": [],
       "must": 2,
-      "ms": 10044
+      "ms": 25249
     },
     {
       "id": "splice-1",
@@ -45,10 +45,11 @@
       "missed": [],
       "extra": [
         "register",
-        "articles"
+        "referencing",
+        "topic_comment"
       ],
-      "must": 1,
-      "ms": 13533
+      "must": 2,
+      "ms": 32822
     },
     {
       "id": "topic-1",
@@ -56,9 +57,11 @@
         "topic_comment"
       ],
       "missed": [],
-      "extra": [],
-      "must": 1,
-      "ms": 14161
+      "extra": [
+        "sentence_boundary"
+      ],
+      "must": 2,
+      "ms": 40596
     },
     {
       "id": "connectors-1",
@@ -66,9 +69,12 @@
         "connectors"
       ],
       "missed": [],
-      "extra": [],
-      "must": 3,
-      "ms": 14615
+      "extra": [
+        "register",
+        "hedging"
+      ],
+      "must": 0,
+      "ms": 38663
     },
     {
       "id": "register-1",
@@ -77,11 +83,10 @@
       ],
       "missed": [],
       "extra": [
-        "collocation",
         "hedging"
       ],
-      "must": 1,
-      "ms": 14770
+      "must": 2,
+      "ms": 42366
     },
     {
       "id": "hedging-1",
@@ -90,8 +95,8 @@
       ],
       "missed": [],
       "extra": [],
-      "must": 2,
-      "ms": 9774
+      "must": 3,
+      "ms": 32488
     },
     {
       "id": "setphrase-1",
@@ -99,9 +104,12 @@
         "set_phrases"
       ],
       "missed": [],
-      "extra": [],
-      "must": 0,
-      "ms": 18274
+      "extra": [
+        "register",
+        "referencing"
+      ],
+      "must": 1,
+      "ms": 44550
     },
     {
       "id": "collocation-1",
@@ -110,10 +118,11 @@
       ],
       "missed": [],
       "extra": [
-        "topic_comment"
+        "register",
+        "referencing"
       ],
       "must": 2,
-      "ms": 14467
+      "ms": 64668
     },
     {
       "id": "uk-1",
@@ -121,9 +130,11 @@
         "uk_conventions"
       ],
       "missed": [],
-      "extra": [],
+      "extra": [
+        "articles"
+      ],
       "must": 0,
-      "ms": 6487
+      "ms": 16051
     },
     {
       "id": "verb-1",
@@ -131,62 +142,57 @@
         "verb_form"
       ],
       "missed": [],
-      "extra": [
-        "countability"
-      ],
-      "must": 3,
-      "ms": 11579
+      "extra": [],
+      "must": 2,
+      "ms": 20940
     },
     {
       "id": "referencing-1",
       "caught": [
-        "referencing",
+        "referencing"
+      ],
+      "missed": [
         "hedging"
       ],
-      "missed": [],
       "extra": [
         "register"
       ],
       "must": 1,
-      "ms": 13022
+      "ms": 17465
     },
     {
       "id": "mixed-1",
       "caught": [
         "set_phrases",
+        "articles",
+        "verb_form",
+        "sentence_boundary",
         "countability",
         "hedging"
       ],
-      "missed": [
-        "articles",
-        "verb_form",
-        "sentence_boundary"
-      ],
+      "missed": [],
       "extra": [
-        "collocation"
+        "register",
+        "referencing"
       ],
-      "must": 4,
-      "ms": 21429
+      "must": 6,
+      "ms": 51005
     },
     {
       "id": "clean-1",
       "caught": [],
       "missed": [],
-      "extra": [
-        "uk_conventions"
-      ],
+      "extra": [],
       "must": 0,
-      "ms": 4730
+      "ms": 18050
     },
     {
       "id": "clean-2",
       "caught": [],
       "missed": [],
-      "extra": [
-        "referencing"
-      ],
-      "must": 1,
-      "ms": 8892
+      "extra": [],
+      "must": 0,
+      "ms": 7072
     }
   ]
 }

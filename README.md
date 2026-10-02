@@ -28,13 +28,13 @@ pnpm dev                      # http://localhost:3000
 
 ## Hosted demo mode
 
-Set `MODEL_PROVIDER=google` and `GOOGLE_GENERATIVE_AI_API_KEY` to serve Gemma 4 31B through Google AI Studio's free tier. [`render.yaml`](render.yaml) deploys this to Render.
+Set `MODEL_PROVIDER=google` and `GOOGLE_GENERATIVE_AI_API_KEY` to serve Gemma 4 26B-A4B through Google AI Studio's free tier. [`render.yaml`](render.yaml) deploys this to Render.
 
 ## How it's built
 
 | Piece | What it does |
 |---|---|
-| **Gemma 4** (open weights, Apache 2.0) | The only model. E4B locally via Ollama; 31B hosted via AI Studio. |
+| **Gemma 4** (open weights, Apache 2.0) | The only model. E4B locally via Ollama; 26B-A4B hosted via AI Studio. |
 | **Mastra** | `tutorAgent` and `librarianAgent` with Zod-typed structured output; the reference check is a Mastra workflow (extract → match → verify). |
 | **SerpApi** | Google Scholar lookups for the reference checker. |
 | **Next.js** | UI and streaming API (`/api/analyze` streams paragraph results as NDJSON). |
