@@ -32,6 +32,7 @@ export function ReferencesView({ text }: { text: string }) {
   const r = state.result;
   return (
     <section className="mx-auto max-w-3xl">
+      <h2 className="mb-2 text-3xl font-bold tracking-tight text-ink">{t.refs.title}</h2>
       <p className="mb-1 text-base text-ink-2">{t.refs.intro}</p>
       <p className="mb-5 text-xs text-ink-3">{t.refs.privacy}</p>
 

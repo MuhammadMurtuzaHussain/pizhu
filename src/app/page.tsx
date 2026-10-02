@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { BookBookmark, BookOpenText, Cloud, GithubLogo, Lock, Notebook, PencilSimpleLine, Warning } from "@phosphor-icons/react";
+import { BookBookmark, BookOpenText, Cloud, Lock, Notebook, PencilSimpleLine, Warning } from "@phosphor-icons/react";
 import { useI18n, type ExplainLang } from "@/lib/i18n/context";
 import type { Locale } from "@/lib/i18n/messages";
 import type { EssayContext } from "@/lib/schema";
@@ -10,6 +10,8 @@ import { useAnalysis } from "@/lib/useAnalysis";
 import { MomoProvider } from "@/lib/momo";
 import { MomoDock } from "@/components/MomoDock";
 import { Welcome } from "@/components/Welcome";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { Footer } from "@/components/Footer";
 import { WriteView } from "@/components/WriteView";
 import { ReferencesView } from "@/components/ReferencesView";
 import { HabitsView } from "@/components/HabitsView";
@@ -17,6 +19,8 @@ import { GlossaryView } from "@/components/GlossaryView";
 
 type Tab = "write" | "references" | "habits" | "glossary";
 type Status = { mode: "local" | "hosted"; model: string; ready: boolean; scholar: boolean; maxWords: number | null };
+
+const DRAFT_KEY = "pizhu.draft.v1";
 
 const TAB_ICONS = { write: PencilSimpleLine, references: BookOpenText, habits: Notebook, glossary: BookBookmark } as const;
 
@@ -47,6 +51,23 @@ function App() {
   const [status, setStatus] = useState<Status | null>(null);
   const analysis = useAnalysis();
   const [lessonOpen, setLessonOpen] = useState(false);
+
+  // Keep the draft in this browser so a refresh never loses it (never uploaded).
+  useEffect(() => {
+    try {
+      const d = localStorage.getItem(DRAFT_KEY);
+      if (d) setText(d); // eslint-disable-line react-hooks/set-state-in-effect
+    } catch {}
+  }, []);
+  useEffect(() => {
+    const id = setTimeout(() => {
+      try {
+        if (text) localStorage.setItem(DRAFT_KEY, text);
+        else localStorage.removeItem(DRAFT_KEY);
+      } catch {}
+    }, 400);
+    return () => clearTimeout(id);
+  }, [text]);
 
   useEffect(() => {
     fetch("/api/status")
@@ -94,6 +115,7 @@ function App() {
             options={Object.entries(t.explainOptions) as [string, string][]}
           />
           <Segmented label="Language / 语言" value={locale} onChange={(v) => setLocale(v as Locale)} options={LOCALE_LABELS} />
+          <ThemeToggle />
         </div>
       </header>
 
@@ -134,18 +156,7 @@ function App() {
       <MomoDock hidden={lessonOpen} />
       <Welcome />
 
-      <footer className="flex items-center gap-2 border-t border-rule py-5 pr-28 text-xs text-ink-3">
-        {t.footer}
-        <a
-          href="https://github.com/MuhammadMurtuzaHussain/pizhu"
-          className="inline-flex items-center gap-1 underline-offset-2 hover:text-ink-2 hover:underline"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <GithubLogo size={14} aria-hidden />
-          GitHub
-        </a>
-      </footer>
+      <Footer />
     </div>
   );
 }

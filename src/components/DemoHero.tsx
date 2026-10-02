@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { ArrowDown, Pause, Play, Sparkle } from "@phosphor-icons/react";
 import { useI18n } from "@/lib/i18n/context";
 import { Momo } from "./Momo";
@@ -80,33 +80,25 @@ export function DemoHero({ onStart, onSample }: { onStart: () => void; onSample:
           >
             {paused ? <Play size={14} weight="fill" aria-hidden /> : <Pause size={14} weight="fill" aria-hidden />}
           </button>
+          {/* Every piece of the demo keeps its final size from the start, so the
+              card never grows or shrinks while it loops (no page jumping). */}
           <div className="grid gap-5 sm:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
-            <p className="min-h-[7.5rem] pt-6 font-serif text-[21px] leading-[1.75] text-ink">
-              {final === 0 ? (
-                <Typed key={cycle} text={sentence} play={!reduce && !paused} />
-              ) : (
-                <>
-                  {sentence.slice(0, i1)}
-                  <Underline on={final >= 1} color="var(--worth)" n={1}>
-                    {SPAN1}
-                  </Underline>
-                  {sentence.slice(i1 + SPAN1.length, i2)}
-                  <Underline on={final >= 3} color="var(--must)" n={2}>
-                    {SPAN2}
-                  </Underline>
-                  {sentence.slice(i2 + SPAN2.length)}
-                </>
-              )}
-            </p>
-            <div className="relative space-y-3 sm:pt-4">
-              <AnimatePresence>
-                {final >= 2 && (
-                  <DemoNote key="n1" n={1} tone="worth" en={t.demo.n1} zh={t.demo.n1zh} zhFirst={locale !== "en"} />
+            <div className="grid pt-6 font-serif text-[21px] leading-[1.75] text-ink">
+              {/* Invisible copy of the finished sentence reserves the height. */}
+              <p aria-hidden className="invisible col-start-1 row-start-1">
+                <Marked sentence={sentence} i1={i1} i2={i2} show1 show2 animate={false} />
+              </p>
+              <p className="col-start-1 row-start-1">
+                {final === 0 ? (
+                  <Typed key={cycle} text={sentence} play={!reduce && !paused} />
+                ) : (
+                  <Marked sentence={sentence} i1={i1} i2={i2} show1={final >= 1} show2={final >= 3} animate />
                 )}
-                {final >= 4 && (
-                  <DemoNote key="n2" n={2} tone="must" en={t.demo.n2} zh={t.demo.n2zh} zhFirst={locale !== "en"} />
-                )}
-              </AnimatePresence>
+              </p>
+            </div>
+            <div className="space-y-3 sm:pt-4">
+              <DemoNote show={final >= 2} n={1} tone="worth" en={t.demo.n1} zh={t.demo.n1zh} zhFirst={locale !== "en"} />
+              <DemoNote show={final >= 4} n={2} tone="must" en={t.demo.n2} zh={t.demo.n2zh} zhFirst={locale !== "en"} />
             </div>
           </div>
         </div>
@@ -141,19 +133,41 @@ function Typed({ text, play }: { text: string; play: boolean }) {
   );
 }
 
-/** A marker-pen underline that draws itself left to right, wrapping across lines. */
-function Underline({ on, color, n, children }: { on: boolean; color: string; n: number; children: React.ReactNode }) {
+function Marked({ sentence, i1, i2, show1, show2, animate }: { sentence: string; i1: number; i2: number; show1: boolean; show2: boolean; animate: boolean }) {
   return (
     <>
-      <UnderlineSpan on={on} color={color}>
-        {children}
-      </UnderlineSpan>
-      {on && <Pearl n={n} on />}
+      {sentence.slice(0, i1)}
+      <Underline on={show1} color="var(--worth)" n={1} animate={animate}>
+        {SPAN1}
+      </Underline>
+      {sentence.slice(i1 + SPAN1.length, i2)}
+      <Underline on={show2} color="var(--must)" n={2} animate={animate}>
+        {SPAN2}
+      </Underline>
+      {sentence.slice(i2 + SPAN2.length)}
     </>
   );
 }
 
-function UnderlineSpan({ on, color, children }: { on: boolean; color: string; children: React.ReactNode }) {
+/** A marker-pen underline that draws itself left to right, wrapping across lines. */
+function Underline({ on, color, n, animate, children }: { on: boolean; color: string; n: number; animate: boolean; children: React.ReactNode }) {
+  return (
+    <>
+      <UnderlineSpan on={on} color={color} animate={animate}>
+        {children}
+      </UnderlineSpan>
+      {on && <Pearl n={n} on animate={animate} />}
+    </>
+  );
+}
+
+function UnderlineSpan({ on, color, animate, children }: { on: boolean; color: string; animate: boolean; children: React.ReactNode }) {
+  if (!animate)
+    return (
+      <span className="rounded-[3px]" style={{ backgroundImage: `linear-gradient(${color}, ${color})`, backgroundRepeat: "no-repeat", backgroundPosition: "0 100%", backgroundSize: "100% 3px" }}>
+        {children}
+      </span>
+    );
   return (
     <motion.span
       className="rounded-[3px] [box-decoration-break:clone] [-webkit-box-decoration-break:clone]"
@@ -167,10 +181,10 @@ function UnderlineSpan({ on, color, children }: { on: boolean; color: string; ch
   );
 }
 
-function Pearl({ n, on }: { n: number; on: boolean }) {
+function Pearl({ n, on, animate = true }: { n: number; on: boolean; animate?: boolean }) {
   return (
     <motion.span
-      initial={{ scale: 0, opacity: 0 }}
+      initial={animate ? { scale: 0, opacity: 0 } : false}
       animate={{ scale: on ? 1 : 0, opacity: on ? 1 : 0 }}
       transition={{ type: "spring", stiffness: 400, damping: 18, delay: 0.5 }}
       className="ml-1 inline-grid h-5 w-5 -translate-y-2 place-items-center rounded-full bg-ink align-middle font-sans text-[11px] font-bold text-white"
@@ -180,13 +194,13 @@ function Pearl({ n, on }: { n: number; on: boolean }) {
   );
 }
 
-function DemoNote({ n, tone, en, zh, zhFirst }: { n: number; tone: "worth" | "must"; en: string; zh: string; zhFirst: boolean }) {
+function DemoNote({ show, n, tone, en, zh, zhFirst }: { show: boolean; n: number; tone: "worth" | "must"; en: string; zh: string; zhFirst: boolean }) {
   const reduce = useReducedMotion();
   return (
     <motion.div
-      initial={reduce ? false : { opacity: 0, x: 24, rotate: 2 }}
-      animate={{ opacity: 1, x: 0, rotate: n === 1 ? -1.2 : 1 }}
-      exit={{ opacity: 0 }}
+      aria-hidden={!show}
+      initial={false}
+      animate={show ? { opacity: 1, x: 0, rotate: n === 1 ? -1.2 : 1 } : { opacity: 0, x: reduce ? 0 : 24, rotate: 2 }}
       transition={{ type: "spring", stiffness: 220, damping: 20 }}
       className={`sticker rounded-2xl p-3.5 text-[13px] leading-snug ${tone === "must" ? "bg-must-bg" : "bg-worth-bg"}`}
     >

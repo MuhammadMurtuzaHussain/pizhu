@@ -9,6 +9,7 @@ import type { ParaState } from "@/lib/useAnalysis";
 import { AnnotatedText } from "./AnnotatedText";
 import { NoteCard } from "./NoteCard";
 import { Momo } from "./Momo";
+import { MarkersEye } from "./MarkersEye";
 
 // Real margin notes: the essay sits on grid paper and every note floats in the
 // margin beside the line it belongs to, like a teacher's 批注. Notes that would
@@ -47,8 +48,18 @@ export function MarginPaper({
   const [marginX, setMarginX] = useState(0);
   const [marginY, setMarginY] = useState(0);
 
-  const notes = paragraphs.flatMap((p) => p.annotations.filter(shown));
+  // While a paragraph is being edited its notes (and connector) are stale, so hide them.
+  const [editing, setEditing] = useState<Set<string>>(new Set());
+  const notes = paragraphs.filter((p) => !editing.has(p.id)).flatMap((p) => p.annotations.filter(shown));
   const key = notes.map((n) => n.id).join("|");
+  const setParaEditing = useCallback((id: string, on: boolean) => {
+    setEditing((s) => {
+      const n = new Set(s);
+      if (on) n.add(id);
+      else n.delete(id);
+      return n;
+    });
+  }, []);
 
   const layout = useCallback(() => {
     const root = paper.current;
@@ -141,6 +152,7 @@ export function MarginPaper({
             activeId={activeId}
             resolved={resolved}
             onActivate={onActivate}
+            onEditing={(on) => setParaEditing(p.id, on)}
             onRecheck={(txt) => onRecheck(p.id, txt)}
           />
         ))}
@@ -202,6 +214,7 @@ function PaperParagraph({
   activeId,
   resolved,
   onActivate,
+  onEditing,
   onRecheck,
 }: {
   index: number;
@@ -211,10 +224,15 @@ function PaperParagraph({
   activeId: string | null;
   resolved: Set<string>;
   onActivate: (id: string, from?: "mark" | "card" | "key") => void;
+  onEditing: (on: boolean) => void;
   onRecheck: (text: string) => void;
 }) {
   const { t } = useI18n();
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditingState] = useState(false);
+  const setEditing = (on: boolean) => {
+    setEditingState(on);
+    onEditing(on);
+  };
   const [draft, setDraft] = useState(p.text);
 
   if (p.status === "skipped") return <h3 className="text-2xl font-semibold tracking-tight text-ink">{p.text}</h3>;
@@ -258,7 +276,14 @@ function PaperParagraph({
                 {t.results.noIssues}
               </span>
             )}
-            {p.status === "error" && <span className="text-sm text-must">{t.results.failed}</span>}
+            {p.status === "error" && (
+              <span className="inline-flex items-center gap-2 text-sm text-must">
+                {t.results.failed}
+                <button onClick={() => onRecheck(p.text)} className="rounded-full bg-taro px-3 py-1 text-xs font-semibold text-on-taro">
+                  {t.results.recheck}
+                </button>
+              </span>
+            )}
             {p.status !== "pending" && (
               <button
                 onClick={() => (setDraft(p.text), setEditing(true))}
@@ -269,6 +294,7 @@ function PaperParagraph({
               </button>
             )}
           </div>
+          {p.status === "done" && p.summary && <MarkersEye summary={p.summary} />}
         </>
       )}
     </div>

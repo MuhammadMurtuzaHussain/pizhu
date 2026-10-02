@@ -119,8 +119,13 @@ export function titleSimilarity(ref: string, result: string): number {
 async function verify(ref: ExtractedRef, raw: string, cited: number): Promise<{ configured: boolean; checked: CheckedRef }> {
   const base = { ...ref, raw, citedInText: cited, issues: [] as ("year" | "author")[], match: null };
   if (!ref.title.trim()) return { configured: true, checked: { ...base, status: "unchecked" } };
-  const q = `${ref.title} ${ref.surnames[0] ?? ""}`.trim();
-  const { configured, results } = await searchScholar(q);
+  // Ask Scholar with its author: operator first (finds the work itself, not reviews
+  // of it); fall back to a title-only search if that finds nothing similar.
+  const first = ref.surnames[0];
+  const withAuthor = first && /[a-z]/.test(first.slice(1)) ? await searchScholar(`${ref.title} author:"${first}"`) : null;
+  const strongIn = (r: { title: string }[]) => r.some((x) => titleSimilarity(ref.title, x.title) >= 0.6);
+  const { configured, results } =
+    withAuthor && withAuthor.configured && strongIn(withAuthor.results) ? withAuthor : await searchScholar(`${ref.title} ${first ?? ""}`.trim());
   if (!configured) return { configured, checked: { ...base, status: "unchecked" } };
 
   const ranked = results.map((r) => ({ r, score: titleSimilarity(ref.title, r.title) })).sort((a, b) => b.score - a.score);
@@ -129,16 +134,19 @@ async function verify(ref: ExtractedRef, raw: string, cited: number): Promise<{ 
 
   // Any strong match can confirm the details (the top hit is sometimes a review of the work).
   const year = ref.year?.match(/\d{4}/)?.[0];
-  const first = ref.surnames[0]?.toLowerCase();
+  const firstLc = first?.toLowerCase();
   const text = (x: (typeof strong)[number]) => `${x.r.summary} ${x.r.title}`.toLowerCase();
-  const yearOk = !year || strong.some((x) => text(x).includes(year));
+  // Scholar often lists a reprint or a later indexing year, so ±1 year still counts as a match.
+  const nearYear = (x: (typeof strong)[number]) =>
+    !year || (text(x).match(/\b(1[89]|20)\d{2}\b/g) ?? []).some((y) => Math.abs(Number(y) - Number(year)) <= 1);
+  const yearOk = strong.some(nearYear);
   // Only check individual surnames; organisations (Ofcom, WHO) are often listed differently.
-  const authorOk = !first || /^[A-Z]{2,}$/.test(ref.surnames[0]) || strong.some((x) => text(x).includes(first));
+  const authorOk = !firstLc || /^[A-Z]{2,}$/.test(ref.surnames[0]) || strong.some((x) => text(x).includes(firstLc));
   // Prefer a hit whose metadata line (not its title) names the author and year: the work itself, not a review of it.
   const meta = (x: (typeof strong)[number]) => x.r.summary.toLowerCase();
   const best =
-    strong.find((x) => (!year || meta(x).includes(year)) && (!first || meta(x).includes(first))) ??
-    strong.find((x) => (!year || text(x).includes(year)) && (!first || text(x).includes(first))) ??
+    strong.find((x) => nearYear(x) && (!firstLc || meta(x).includes(firstLc))) ??
+    strong.find((x) => nearYear(x) && (!firstLc || text(x).includes(firstLc))) ??
     strong[0];
   const issues: ("year" | "author")[] = [...(yearOk ? [] : ["year" as const]), ...(authorOk ? [] : ["author" as const])];
   return { configured, checked: { ...base, status: issues.length ? "mismatch" : "found", issues, match: best.r } };

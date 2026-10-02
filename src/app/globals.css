@@ -12,29 +12,32 @@
   --card: #ffffff;
   --ink: #2a2233;            /* tapioca */
   --ink-2: #5a5166;
-  --ink-3: #857c92;
+  --ink-3: #6f6680;
   --rule: #e6e0f2;
   --taro: #7353cf;           /* 芋头 taro, brand + primary actions */
   --taro-soft: #eee8ff;
   --taro-2: #b8a4f2;
   --on-taro: #ffffff;
   --berry: #f2b8c6;          /* strawberry milk, decorative */
-  --must: #cf3f68;           /* strawberry */
+  --must: #b52a52;           /* strawberry */
   --must-bg: #fde6ee;
-  --worth: #9a6a00;          /* mango */
+  --worth: #87590a;          /* mango */
   --worth-bg: #fff2c7;
   --mango: #f5d66b;
   --style: #4f6187;          /* earl grey */
   --style-bg: #e7ebf6;
-  --ok: #4b8636;             /* matcha */
+  --ok: #3a6e29;             /* matcha */
   --ok-bg: #e5f2dc;
   --grid: rgb(115 83 207 / 0.07);
   --focus: #5b3fd1;
   --shadow: 42 34 51;
 }
 
+/* Dark tokens apply when the system is dark (unless the user picked light),
+   or when the user picked dark explicitly from the header toggle. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
+    color-scheme: dark;
     --paper: #16121e;        /* taro night */
     --paper-2: #1f1929;
     --card: #231c2f;
@@ -60,6 +63,36 @@
     --focus: #c2b2ff;
     --shadow: 0 0 0;
   }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #16121e;        /* taro night */
+  --paper-2: #1f1929;
+  --card: #231c2f;
+  --ink: #f4f0fb;
+  --ink-2: #cbc2d9;
+  --ink-3: #9a90ab;
+  --rule: #352c45;
+  --taro: #a68cf2;
+  --taro-soft: #2e2445;
+  --taro-2: #6f58b8;
+  --on-taro: #1a1426;
+  --berry: #8a4f63;
+  --must: #ff7fa3;
+  --must-bg: #3b1d2a;
+  --worth: #f3c84b;
+  --worth-bg: #33290f;
+  --mango: #e8c457;
+  --style: #a5b5da;
+  --style-bg: #212a3d;
+  --ok: #93d27c;
+  --ok-bg: #1c2a17;
+  --grid: rgb(166 140 242 / 0.08);
+  --focus: #c2b2ff;
+  --shadow: 0 0 0;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
 }
 
 @theme inline {
@@ -148,6 +181,9 @@ select,
   :root:not([data-theme="light"]) .sticker {
     border-color: #3a3049;
   }
+}
+:root[data-theme="dark"] .sticker {
+  border-color: #3a3049;
 }
 
 /* Annotated spans: a soft marker-pen underline, washed with colour when active. */

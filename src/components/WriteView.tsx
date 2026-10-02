@@ -2,13 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, ArrowRight, Cloud, Keyboard, Lock, PencilSimple, PlayCircle, Smiley, Sparkle, UploadSimple } from "@phosphor-icons/react";
+import { ArrowLeft, ArrowRight, CheckCircle, Cloud, Keyboard, Lock, PencilSimple, PlayCircle, Smiley, Sparkle, UploadSimple } from "@phosphor-icons/react";
 import { useI18n } from "@/lib/i18n/context";
 import { useMomo } from "@/lib/momo";
 import type { Annotation, EssayContext } from "@/lib/schema";
 import { SAMPLE_ESSAY } from "@/lib/sample";
 import { wordCount } from "@/lib/paragraphs";
 import { CATEGORIES, type CategoryId } from "@/lib/taxonomy";
+import { recordHandled } from "@/lib/habits";
 import type { useAnalysis, ParaState } from "@/lib/useAnalysis";
 import { AnnotatedText } from "./AnnotatedText";
 import { NoteSheet } from "./NoteSheet";
@@ -20,9 +21,10 @@ import { DemoHero } from "./DemoHero";
 import { MarginPaper } from "./MarginPaper";
 import { LessonMode } from "./LessonMode";
 import { Momo } from "./Momo";
+import { MarkersEye } from "./MarkersEye";
 
 type Analysis = ReturnType<typeof useAnalysis>;
-type Status = { mode: "local" | "hosted"; maxWords: number | null } | null;
+type Status = { mode: "local" | "hosted"; model: string; ready: boolean; maxWords: number | null } | null;
 
 function useIsDesktop() {
   return useSyncExternalStore(
@@ -66,6 +68,7 @@ export function WriteView({
       maxWords={status?.maxWords ?? null}
       onBack={reset}
       onRecheck={(id, txt) => recheck(id, txt, fullCtx)}
+      onRetry={() => analyze(text, fullCtx)}
       onLessonChange={onLessonChange}
     />
   );
@@ -130,6 +133,12 @@ function Composer({
           </ul>
         </div>
 
+        {status && !status.ready && (
+          <div role="alert" className="mb-5 flex items-center gap-4 rounded-[1.5rem] bg-worth-bg p-4 text-sm text-ink">
+            <Momo state="thinking" size={56} className="shrink-0" />
+            <p>{t.errors.notReady(status.model)}</p>
+          </div>
+        )}
         <div className="grid-paper shadow-lift rounded-[2rem] p-5 sm:p-8">
           <ContextSentence value={context} onChange={setContext} />
           <div
@@ -191,7 +200,13 @@ function Composer({
               <Sparkle size={16} aria-hidden />
               {t.editor.sample}
             </button>
-            <span className="ml-auto text-xs tabular-nums text-ink-3">
+            {text.trim() && (
+              <span className="ml-auto inline-flex items-center gap-1 text-xs text-ink-3">
+                <CheckCircle size={14} weight="fill" className="text-ok" aria-hidden />
+                {t.extra.saved}
+              </span>
+            )}
+            <span className={`${text.trim() ? "" : "ml-auto"} text-xs tabular-nums text-ink-3`}>
               {wordCount(text)}
               {status?.maxWords ? ` / ${status.maxWords}` : ""} {t.editor.words}
             </span>
@@ -210,12 +225,14 @@ function Results({
   maxWords,
   onBack,
   onRecheck,
+  onRetry,
   onLessonChange,
 }: {
   run: Analysis["run"];
   maxWords: number | null;
   onBack: () => void;
   onRecheck: (id: string, text: string) => void;
+  onRetry: () => void;
   onLessonChange: (open: boolean) => void;
 }) {
   const { t, locale, script } = useI18n();
@@ -268,6 +285,10 @@ function Results({
     setMood(all.length === 0 ? "happy" : "idle");
   }, [run.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    if (run.status === "error") say(run.error === "rate_limited" ? t.errors.rateLimited : t.errors.generic, "thinking", 8000);
+  }, [run.status]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Celebrate once, when every must-fix note is handled or dismissed.
   const mustTotal = all.filter((a) => a.severity === "must_fix").length;
   const mustOpen = live.filter((a) => a.severity === "must_fix" && !resolved.has(a.id)).length;
@@ -290,18 +311,24 @@ function Results({
       return n;
     });
     if (!wasResolved) {
+      const cat = all.find((a) => a.id === id)?.category;
+      if (cat) recordHandled(cat);
       react("happy", 900);
       const count = resolved.size + 1;
       if (count % 3 === 0) say(t.dock.cheers[count % t.dock.cheers.length], undefined, 2200);
     }
   };
-  const dismiss = (id: string) =>
+  const undismiss = (id: string) =>
     setDismissed((s) => {
       const n = new Set(s);
-      if (n.has(id)) n.delete(id);
-      else n.add(id);
+      n.delete(id);
       return n;
     });
+  const dismiss = (id: string) => {
+    if (dismissed.has(id)) return undismiss(id);
+    setDismissed((s) => new Set(s).add(id));
+    say({ text: t.extra.hidden, action: { label: t.extra.undo, onClick: () => undismiss(id) } }, undefined, 6000);
+  };
 
   const activate = useCallback(
     (id: string, from: "mark" | "card" | "key" = "mark") => {
@@ -415,7 +442,17 @@ function Results({
         </div>
       )}
 
-      {run.error && <p className="mb-4 rounded-xl bg-must-bg px-4 py-3 text-sm text-must">{run.error}</p>}
+      {run.error && (
+        <div role="alert" className="mb-8 flex max-w-2xl items-center gap-4 rounded-[1.5rem] bg-must-bg p-4">
+          <Momo state="thinking" size={64} className="shrink-0" />
+          <div>
+            <p className="text-sm text-ink">{run.error === "rate_limited" ? t.errors.rateLimited : t.errors.generic}</p>
+            <button onClick={onRetry} className="mt-2 rounded-full bg-taro px-4 py-1.5 text-xs font-semibold text-on-taro active:scale-[0.98]">
+              {t.errors.retry}
+            </button>
+          </div>
+        </div>
+      )}
 
       {isDesktop ? (
         <MarginPaper
@@ -527,6 +564,7 @@ function MobileParagraph({
         )}
         {p.status === "error" && <span className="text-sm text-must">{t.results.failed}</span>}
       </div>
+      {p.status === "done" && p.summary && <MarkersEye summary={p.summary} />}
     </div>
   );
 }

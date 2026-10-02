@@ -41,3 +41,29 @@ export function totals(sessions: HabitSession[], days = 30) {
   }
   return Object.entries(t).sort((a, b) => b[1] - a[1]) as [CategoryId, number][];
 }
+
+// Stamp book (集章册): handling notes of a habit with "Got it" earns its stamp.
+export const STAMP_AT = 3;
+const HANDLED_KEY = "pizhu.handled.v1";
+
+export function loadHandled(): Partial<Record<CategoryId, number>> {
+  try {
+    return JSON.parse(localStorage.getItem(HANDLED_KEY) ?? "{}");
+  } catch {
+    return {};
+  }
+}
+
+export function recordHandled(category: CategoryId) {
+  try {
+    const h = loadHandled();
+    h[category] = (h[category] ?? 0) + 1;
+    localStorage.setItem(HANDLED_KEY, JSON.stringify(h));
+  } catch {}
+}
+
+export function clearHandled() {
+  try {
+    localStorage.removeItem(HANDLED_KEY);
+  } catch {}
+}

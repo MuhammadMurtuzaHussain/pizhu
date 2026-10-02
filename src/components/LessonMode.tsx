@@ -8,6 +8,7 @@ import { useMomo } from "@/lib/momo";
 import type { Annotation } from "@/lib/schema";
 import { CATEGORIES, type CategoryId } from "@/lib/taxonomy";
 import { CategoryIcon } from "./CategoryIcon";
+import { saveNodeAsPng } from "@/lib/snapshot";
 import { Momo } from "./Momo";
 
 // One note at a time, full screen. Progress is a row of tapioca pearls.
@@ -277,17 +278,7 @@ function ShareButton({ handled, habits }: { handled: number; habits: CategoryId[
     if (!node.current) return;
     setBusy(true);
     try {
-      const { toPng } = await import("html-to-image");
-      const url = await toPng(node.current, { pixelRatio: 2, cacheBust: true });
-      const blob = await (await fetch(url)).blob();
-      const file = new File([blob], "pizhu-progress.png", { type: "image/png" });
-      if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], title: "Pīzhù 批注" });
-      else {
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "pizhu-progress.png";
-        a.click();
-      }
+      await saveNodeAsPng(node.current, "pizhu-progress.png");
     } catch (e) {
       console.error(e);
     } finally {
