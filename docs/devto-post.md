@@ -55,6 +55,23 @@ So I built **Pīzhù (批注)**. The word means *margin notes*: the comments a g
 
 ## Code
 
+Everything is open source (MIT) at **[github.com/MuhammadMurtuzaHussain/pizhu](https://github.com/MuhammadMurtuzaHussain/pizhu)**. If you only read four files, read these:
+
+| File | What it does |
+|---|---|
+| [`src/lib/guard.ts`](https://github.com/MuhammadMurtuzaHussain/pizhu/blob/main/src/lib/guard.ts) | The "never rewrite" rule: verbatim spans and a word-level edit budget for nudges |
+| [`src/mastra/agents/prompts.ts`](https://github.com/MuhammadMurtuzaHussain/pizhu/blob/main/src/mastra/agents/prompts.ts) | The tutor brief: twelve Mandarin-to-English habits and the checklist Gemma follows |
+| [`src/mastra/workflows/references.ts`](https://github.com/MuhammadMurtuzaHussain/pizhu/blob/main/src/mastra/workflows/references.ts) | The reference check: Gemma extracts, code matches, SerpApi verifies |
+| [`src/components/MarginPaper.tsx`](https://github.com/MuhammadMurtuzaHussain/pizhu/blob/main/src/components/MarginPaper.tsx) | Margin notes positioned beside each line, with the ink connector |
+
+Run it privately on your own laptop in three commands:
+
+```bash
+ollama pull gemma4:e4b
+git clone https://github.com/MuhammadMurtuzaHussain/pizhu && cd pizhu && pnpm install
+pnpm dev   # http://localhost:3000
+```
+
 {% github MuhammadMurtuzaHussain/pizhu %}
 
 ## How I Built It

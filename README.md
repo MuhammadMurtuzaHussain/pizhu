@@ -1,17 +1,21 @@
-<div align="center">
+<p align="center">
+  <a href="https://pizhu.onrender.com"><img src="https://raw.githubusercontent.com/MuhammadMurtuzaHussain/pizhu/main/src/app/opengraph-image.png" alt="Pīzhù 批注: margin notes, not rewrites. Mòmo the ink panda holding a bubble tea." width="100%" /></a>
+</p>
 
-<img src="src/app/icon.svg" width="72" alt="Mòmo the ink panda" />
+<p align="center">
+  <b>Margin notes, not rewrites.</b> An open-source writing tutor for Mandarin-speaking students at UK and Irish universities, powered by open-weight <b>Gemma 4</b>.
+</p>
 
-# Pīzhù 批注
+<p align="center">
+  <a href="https://pizhu.onrender.com"><b>Live demo</b></a> ·
+  <a href="https://dev.to/muhammadmurtuzahussain">DEV post</a> ·
+  <a href="#run-it-locally-private-nothing-leaves-your-laptop">Run locally</a> ·
+  Built for the <a href="https://dev.to/challenges/hacktoberfest-weekend-2026-10-01">DEV Hacktoberfest Weekend Challenge</a>
+</p>
 
-**Margin notes, not rewrites.**
-An open-source writing tutor for Mandarin-speaking students at UK and Irish universities, powered by open-weight **Gemma 4**.
-
-[**Try the live demo →**](https://pizhu.onrender.com) · [DEV post](https://dev.to/muhammadmurtuzahussain) · Built for the [DEV Hacktoberfest Weekend Challenge: Build for a Friend](https://dev.to/challenges/hacktoberfest-weekend-2026-10-01)
-
-<img src="docs/screenshots/demo.gif" width="760" alt="Pīzhù's demo: a Chinglish sentence gets marker-pen underlines and bilingual margin notes" />
-
-</div>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/MuhammadMurtuzaHussain/pizhu/main/docs/screenshots/demo.gif" alt="A Chinglish sentence gets marker-pen underlines and bilingual margin notes" width="760" />
+</p>
 
 ## Why
 
@@ -38,9 +42,9 @@ Pīzhù does what a good tutor does in the margin: it points at the exact words,
 
 | Margin notes | Lesson mode |
 |---|---|
-| <img src="docs/screenshots/margin-notes.png" alt="Essay on grid paper with notes in the margin" /> | <img src="docs/screenshots/lesson.png" alt="One note at a time with pearl progress" /> |
+| <img src="https://raw.githubusercontent.com/MuhammadMurtuzaHussain/pizhu/main/docs/screenshots/margin-notes.png" alt="Essay on grid paper with notes in the margin" /> | <img src="https://raw.githubusercontent.com/MuhammadMurtuzaHussain/pizhu/main/docs/screenshots/lesson.png" alt="One note at a time with pearl progress" /> |
 | **Stamp book** | **Mobile, dark, 简体中文** |
-| <img src="docs/screenshots/habits.png" alt="The 集章 stamp book" /> | <img src="docs/screenshots/mobile-sheet-dark.png" width="300" alt="Mobile bottom sheet in dark mode" /> |
+| <img src="https://raw.githubusercontent.com/MuhammadMurtuzaHussain/pizhu/main/docs/screenshots/habits.png" alt="The 集章 stamp book" /> | <img src="https://raw.githubusercontent.com/MuhammadMurtuzaHussain/pizhu/main/docs/screenshots/mobile-sheet-dark.png" width="300" alt="Mobile bottom sheet in dark mode" /> |
 
 ## Run it locally (private: nothing leaves your laptop)
 
