@@ -31,6 +31,7 @@ Pīzhù does what a good tutor does in the margin: it points at the exact words,
 |---|---|
 | **True margin notes** | The essay sits on grid paper; every note floats beside its line, joined to its words by an ink connector. |
 | **Never rewrites (enforced in code)** | Every highlighted span must exist verbatim in the student's text, and any suggested fix that changes more than a few words is stripped back to a hint ([`src/lib/guard.ts`](src/lib/guard.ts)). |
+| **Whole-paper overview** | Mòmo reads the entire paper in one pass: what it thinks your argument is, what works, and the top three whole-paper priorities. Paste your assignment brief and each criterion is explained in plain English and Chinese, then marked met / partly / missing. |
 | **Word export** | Download your own text, unchanged, with every note as a real Word comment in the margin. |
 | **Lesson mode** | One note at a time, tapioca-pearl progress, keyboard controls, and a shareable progress card (no essay text in it). |
 | **Mòmo 墨墨** | An ink-panda companion who reads with you, cheers you on and stamps 好 when you are done. |
